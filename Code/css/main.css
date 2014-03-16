@@ -94,16 +94,19 @@ input
 /* CONTENT */
 #content
 {
-    position: relative;
-    margin: 0 auto;
+    position: absolute;
     width: 987px;
     height: 625px;
+    top: 50%;
+    left: 50%;
+    margin-top: -312.5px;
+    margin-left: -493.5px;
 }
 
 #titleBox
 {
     position: absolute;
-    top: 10px;
+    top: 15px;
     left: 0px;
     width: 375px;
     height: 40px;

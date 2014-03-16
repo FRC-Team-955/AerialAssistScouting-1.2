@@ -1,5 +1,6 @@
 var keycodes = { zero: 48, nine: 57, tab: 9 };
-var maxStickButtons = 24;
+var joycodes = { a: 0, b: 1, x: 2, y: 3, leftBumper: 4, rightBumper: 5, leftTrigger: 6, rightTrigger: 7, back: 8, start: 9, leftStick: 10, rightStick: 11, dpadUp: 12, dpadDown: 13, dpadLeft: 14, dpadRight: 15 };
+var maxStickButtons = 16;
 var pressedThreshold = 0.5;
 var bgWhite = "backgroundWhite";
 var bgRed = "backgroundRed";
@@ -26,6 +27,7 @@ var comments = ["", "", "", "", "", ""];
 
 var joysticks = [0, 0];
 var teamIndexs = [0, 0];
+var autoModes = [true, false];
 
 $(document).ready(init);
 
@@ -98,6 +100,38 @@ function reset()
 function main()
 {
     updateJoysticks();
+    
+    for(var joystickIndex = 0; joystickIndex < joysticks.length; joystickIndex++)
+    {
+        if(joysticks[joystickIndex].getButton(joycodes.start))
+            autoModes[joystickIndex] = !autoModes[joystickIndex];
+            
+        var dataIndex = -1;
+            
+        if(joysticks[joystickIndex].getButton(joycodes.a))
+            dataIndex = 3;
+
+        if(joysticks[joystickIndex].getButton(joycodes.b))
+            dataIndex = 2;
+
+        if(joysticks[joystickIndex].getButton(joycodes.x))
+            dataIndex = 1;
+
+        if(joysticks[joystickIndex].getButton(joycodes.y))
+            dataIndex = 0;
+
+        if(dataIndex > -1)
+        {
+            if(autoModes[joystickIndex])
+                autoData[teamIndexs[joystickIndex]] =  $autoData[joystickIndex][dataIndex].value = ($autoData[joystickIndex][dataIndex].value - 0) + 1; 
+
+            else
+                teleopData[teamIndexs[joystickIndex]] =  $teleopData[joystickIndex][dataIndex].value = ($teleopData[joystickIndex][dataIndex].value - 0) + 1; 
+        }
+
+        print(teleopData[teamIndexs[joystickIndex]]);
+    }
+   
     window.webkitRequestAnimationFrame(main);
 }
 
