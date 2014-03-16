@@ -36,17 +36,19 @@
 .redDataContainer
 {
     position: absolute;
+    top: 24px;
     right: 100px;
-    bottom: 25px;
     width: 65px;
+    font-size: 10px;
 }
 
 .blueDataContainer
 {
     position: absolute;
+    top: 24px;
     right: 30px;
-    bottom: 25px;
     width: 65px;
+    font-size: 10px;
 }
 
 .data
@@ -54,7 +56,7 @@
     position: relative;
     width: 100%;
     height: 22px;
-    margin: 6px auto;
+    margin: 0px auto 16px auto;
     font-size: 16px;
 }
 
@@ -80,7 +82,7 @@
     height: 210px;
 }
 
-.tagAndCommentBox
+.tagAndCommentContainer
 {
     position: absolute;
     bottom: 30px;
@@ -90,9 +92,30 @@
 .tagAndCommentInput
 {
     position: absolute;
+    width: 100%;
+    top: 15px;
+    left: 0px;
+    bottom: 0px;
+}
+
+.redTagAndCommentContainer
+{
+    position: absolute;
     width: 140px;
-    height: 130px;
-    margin-top: 20px;
+    height: 150px;
+    left: 0px;
+    bottom: 0px;
+    font-size: 10px;
+}
+
+.blueTagAndCommentContainer
+{
+    position: absolute;
+    width: 140px;
+    height: 150px;
+    right: 0px;
+    bottom: 0px;
+    font-size: 10px;
 }
 
 #tagsContainer
@@ -105,16 +128,4 @@
 {
     top: 10px;
     right: 30px;
-}
-
-#redTags, #redComments
-{
-    left: 0px;
-    bottom: 0px;
-}
-
-#blueTags, #blueComments
-{
-    right: 0px;
-    bottom: 0px;
 }

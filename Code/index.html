@@ -37,18 +37,20 @@
                     <div class="label backgroundBlue curvedBorder borderGray centerText">Zone:</div>
                 </div>
                 <div class="redDataContainer">
-                    <input type="text" id="redAutoHigh" class="data curvedBorder borderGray centerText">
-                    <input type="text" id="redAutoLow" class="data curvedBorder borderGray centerText">
-                    <input type="text" id="redAutoHotHigh" class="data curvedBorder borderGray centerText">
-                    <input type="text" id="redAutoHotLow" class="data curvedBorder borderGray centerText">
-                    <div id="redAutoZone" class="data curvedBorder backgroundWhite borderGray centerText"></div>
+                    Red
+                    <input type="text" id="redAutoHigh" class="data centerText">
+                    <input type="text" id="redAutoLow" class="data centerText">
+                    <input type="text" id="redAutoHotHigh" class="data centerText">
+                    <input type="text" id="redAutoHotLow" class="data centerText">
+                    <div id="redAutoZone" class="data centerText"></div>
                 </div>
                 <div class="blueDataContainer">
-                    <input type="text" id="blueAutoHigh" class="data curvedBorder borderGray centerText">
-                    <input type="text" id="blueAutoLow" class="data curvedBorder borderGray centerText">
-                    <input type="text" id="blueAutoHotHigh" class="data curvedBorder borderGray centerText">
-                    <input type="text" id="blueAutoHotLow" class="data curvedBorder borderGray centerText">
-                    <div id="blueAutoZone" class="data curvedBorder backgroundWhite borderGray centerText"></div>
+                    Blue
+                    <input type="text" id="blueAutoHigh" class="data centerText">
+                    <input type="text" id="blueAutoLow" class="data centerText">
+                    <input type="text" id="blueAutoHotHigh" class="data centerText">
+                    <input type="text" id="blueAutoHotLow" class="data centerText">
+                    <div id="blueAutoZone" class="data centerText"></div>
                 </div>
             </div>
             <div id="teleopContainer" class="backgroundLightGray dataCollection centerText">
@@ -61,30 +63,44 @@
                     <div class="label backgroundBlue curvedBorder borderGray centerText">Zone:</div>
                 </div>
                 <div class="redDataContainer">
-                    <input type="text" id="redTeleopHigh" class="data curvedBorder borderGray centerText">
-                    <input type="text" id="redTeleopLow" class="data curvedBorder borderGray centerText">
-                    <input type="text" id="redTeleopHotHigh" class="data curvedBorder borderGray centerText">
-                    <input type="text" id="redTeleopHotLow" class="data curvedBorder borderGray centerText">
-                    <div id="redTeleopZone" class="data curvedBorder backgroundWhite borderGray centerText"></div>
+                    Red
+                    <input type="text" id="redTeleopHigh" class="data centerText">
+                    <input type="text" id="redTeleopLow" class="data centerText">
+                    <input type="text" id="redTeleopHotHigh" class="data centerText">
+                    <input type="text" id="redTeleopHotLow" class="data centerText">
+                    <div id="redTeleopZone" class="data centerText"></div>
                 </div>
                 <div class="blueDataContainer">
-                    <input type="text" id="blueTeleopHigh" class="data curvedBorder borderGray centerText">
-                    <input type="text" id="blueTeleopLow" class="data curvedBorder borderGray centerText">
-                    <input type="text" id="blueTeleopHotHigh" class="data curvedBorder borderGray centerText">
-                    <input type="text" id="blueTeleopHotLow" class="data curvedBorder borderGray centerText">
-                    <div id="blueTeleopZone" class="data curvedBorder backgroundWhite borderGray centerText"></div>
+                    Blue
+                    <input type="text" id="blueTeleopHigh" class="data centerText">
+                    <input type="text" id="blueTeleopLow" class="data centerText">
+                    <input type="text" id="blueTeleopHotHigh" class="data centerText">
+                    <input type="text" id="blueTeleopHotLow" class="data centerText">
+                    <div id="blueTeleopZone" class="data centerText"></div>
                 </div>
             </div>
             <div id="tagsAndCommentsContainer" class="backgroundLightGray">
-                <div id="tagsContainer" class="tagAndCommentBox centerText">
+                <div id="tagsContainer" class="tagAndCommentContainer centerText">
                     Tags
-                    <textarea id="redTags" class="tagAndCommentInput"></textarea>
-                    <textarea id="blueTags" class="tagAndCommentInput"></textarea>
+                    <div class="redTagAndCommentContainer centerText">
+                        Red
+                        <textarea id="redTags" class="tagAndCommentInput"></textarea>
+                    </div>
+                    <div class="blueTagAndCommentContainer centerText">
+                        Blue
+                        <textarea id="blueTags" class="tagAndCommentInput"></textarea>
+                    </div>
                 </div>
-                <div id="commentsContainer" class="tagAndCommentBox centerText">
+                <div id="commentsContainer" class="tagAndCommentContainer centerText">
                     Comments
-                    <textarea id="redComments" class="tagAndCommentInput"></textarea>
-                    <textarea id="blueComments" class="tagAndCommentInput"></textarea>
+                    <div class="redTagAndCommentContainer centerText">
+                        Red
+                        <textarea id="redComments" class="tagAndCommentInput"></textarea>
+                    </div>
+                    <div class="blueTagAndCommentContainer centerText">
+                        Blue
+                        <textarea id="blueComments" class="tagAndCommentInput"></textarea>
+                    </div>
                 </div>
             </div>
         </div>
