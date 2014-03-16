@@ -1,0 +1,63 @@
+#dataCollectonContainer
+{
+    position: absolute;
+    top: 85px;
+    left: 0px;
+    width: 800px;
+    height: 550px;
+}
+
+/* AUTO AND TELEOP */
+.dataCollection
+{
+    position: absolute;
+    top: 30px;
+    width: 330px;
+    height: 250px;
+}
+
+/* AUTO */
+#autoContainer
+{
+    left: 30px;
+}
+
+/* TELEOP */
+#teleopContainer
+{
+    right: 30px;
+}
+
+/* TAGS AND COMMENTS */
+#tagsAndCommentsContainer
+{
+    position: absolute;
+    left: 30px;
+    right: 30px;
+    bottom: 30px;
+    height: 210px;
+}
+
+.tagAndCommentBox
+{
+    position: absolute;
+    bottom: 30px;
+    width: 300px;
+}
+
+.tagAndCommentInput
+{
+    width: 100%;
+    height: 135px;
+    margin-top: 10px;
+}
+
+#tagsContainer
+{
+    left: 30px;
+}
+
+#commentsContainer
+{
+    right: 30px;
+}

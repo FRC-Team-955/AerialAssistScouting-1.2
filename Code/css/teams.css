@@ -1,0 +1,16 @@
+.team
+{
+    width: 120px;
+    height: 25px;
+    margin: 5px 10px;
+    display: inline-block;
+    font-size: 16px;
+}
+
+#teamsContainer
+{
+    position: absolute;
+    top: 0px;
+    left: 380px;
+    width: 440px;
+}

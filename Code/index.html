@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <link rel="shortcut icon" href="images/logoThumbnail.png">
+    <link rel="stylesheet" type="text/css" href="css/main.css"/>
+    <link rel="stylesheet" type="text/css" href="css/teams.css"/>
+    <link rel="stylesheet" type="text/css" href="css/dataCollection.css"/>
+    <link rel="stylesheet" type="text/css" href="css/matchNumber.css"/>
+    <link rel="stylesheet" type="text/css" href="css/fileButtons.css"/>
+<!--    <script type="text/javascript" src="js/jquery/jquery-2.1.0.min.js"></script>
+    <script type="text/javascript" src="js/blob/Blob.js"></script>
+    <script type="text/javascript" src="js/fileSaver/FileSaver.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>-->
+    <title>Aerial Assist Scouting 1.2!</title>
+</head>
+<body class="backgroundLightGray">
+    <div id="content">
+        <div id="titleBox" class="backgroundDarkGray curvedBorder centerText">SCOUTING: THE PROGRAM v1.2</div>
+        <div id="teamsContainer">
+            <input type="text" id="red1" class="team backgroundRed centerText curvedBorder">
+            <input type="text" id="red2" class="team backgroundRed centerText curvedBorder">
+            <input type="text" id="red3" class="team backgroundRed centerText curvedBorder">
+            <input type="text" id="blue1" class="team backgroundBlue centerText curvedBorder">
+            <input type="text" id="blue2" class="team backgroundBlue centerText curvedBorder">
+            <input type="text" id="blue3" class="team backgroundBlue centerText curvedBorder">
+        </div>
+        <div id="dataCollectonContainer" class="backgroundGray">
+            <div id="autoContainer" class="backgroundLightGray dataCollection centerText">
+                Autonomous
+            </div>
+            <div id="teleopContainer" class="backgroundLightGray dataCollection centerText">
+                Teleop
+            </div>
+            <div id="tagsAndCommentsContainer" class="backgroundLightGray">
+                <div id="tagsContainer" class="tagAndCommentBox centerText">
+                    Tags
+                    <textarea id="tags" class="tagAndCommentInput"></textarea>
+                </div>
+                <div id="commentsContainer" class="tagAndCommentBox centerText">
+                    Comments
+                    <textarea id="commeents" class="tagAndCommentInput"></textarea>
+                </div>
+            </div>
+        </div>
+        <div id="matchNumberContainer">
+            <div id ="matchTitleBox" class="backgroundDarkGray curvedBorder centerText">MATCH #:</div>
+            <input type="text" id="matchNumber" class="backgroundDarkGray curvedBorder centerText">
+        </div>
+        <div id="fileButtonsContainer">
+            <div id="saveMatchFileBox" class="backgroundBlue centerText curvedBorder borderGray">SAVE</div>
+            <div id="createMasterFileBox" class="backgroundBlue centerText curvedBorder borderGray">CREATE MASTER FILE</div>
+            <input type="file" id="createMasterFile" multiple/>
+        </div>
+    </div>
+</body>
+</html>

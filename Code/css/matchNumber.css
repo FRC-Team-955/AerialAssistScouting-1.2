@@ -1,0 +1,31 @@
+#matchNumberContainer
+{
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    width: 150px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+#matchTitleBox
+{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 50px;
+    line-height: 50px;
+}
+
+#matchNumber
+{
+    position: relative;
+    top: 75px;
+    width: 100px;
+    height: 50px;
+    display: block;
+    margin: 0 auto;
+    font-size: 24px;
+    font-weight: bold;
+}
