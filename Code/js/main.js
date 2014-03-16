@@ -1,4 +1,4 @@
-var keycodes = { zero: 48, nine: 57 };
+var keycodes = { zero: 48, nine: 57, tab: 9 };
 var $autoData = [];
 var $teleopData = [];
 
@@ -16,7 +16,7 @@ function textInputCallback(e)
 {
     var code = e.keyCode;
     
-    if(code < keycodes.zero || code > keycodes.nine)
+    if(code != keycodes.tab && (code < keycodes.zero || code > keycodes.nine))
         return false;
 }
 
