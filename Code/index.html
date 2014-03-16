@@ -29,9 +29,37 @@
         <div id="dataCollectonContainer" class="backgroundGray">
             <div id="autoContainer" class="backgroundLightGray dataCollection centerText">
                 Autonomous
+                <div class="labelContainer">
+                    <div class="label backgroundBlue curvedBorder borderGray centerText">High:</div>
+                    <div class="label backgroundBlue curvedBorder borderGray centerText">Low:</div>
+                    <div class="label backgroundBlue curvedBorder borderGray centerText">Hot High:</div>
+                    <div class="label backgroundBlue curvedBorder borderGray centerText">Hot Low:</div>
+                    <div class="label backgroundBlue curvedBorder borderGray centerText">Zone:</div>
+                </div>
+                <div class="dataContainer">
+                    <input type="text" id="autoHigh" class="data curvedBorder borderGray centerText">
+                    <input type="text" id="autoLow" class="data curvedBorder borderGray centerText">
+                    <input type="text" id="autoHotHigh" class="data curvedBorder borderGray centerText">
+                    <input type="text" id="autoHotLow" class="data curvedBorder borderGray centerText">
+                    <div id="autoZone" class="data curvedBorder backgroundWhite borderGray centerText"></div>
+                </div>
             </div>
             <div id="teleopContainer" class="backgroundLightGray dataCollection centerText">
                 Teleop
+                <div class="labelContainer">
+                    <div class="label backgroundBlue curvedBorder borderGray centerText">High:</div>
+                    <div class="label backgroundBlue curvedBorder borderGray centerText">Low:</div>
+                    <div class="label backgroundBlue curvedBorder borderGray centerText">Passes:</div>
+                    <div class="label backgroundBlue curvedBorder borderGray centerText">Truss:</div>
+                    <div class="label backgroundBlue curvedBorder borderGray centerText">Zone:</div>
+                </div>
+                <div class="dataContainer">
+                    <input type="text" id="teleopHigh" class="data curvedBorder borderGray centerText">
+                    <input type="text" id="teleopLow" class="data curvedBorder borderGray centerText">
+                    <input type="text" id="teleopHotHigh" class="data curvedBorder borderGray centerText">
+                    <input type="text" id="teleopHotLow" class="data curvedBorder borderGray centerText">
+                    <div id="teleopZone" class="data curvedBorder backgroundWhite borderGray centerText"></div>
+                </div>
             </div>
             <div id="tagsAndCommentsContainer" class="backgroundLightGray">
                 <div id="tagsContainer" class="tagAndCommentBox centerText">
