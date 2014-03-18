@@ -74,15 +74,14 @@ function reset()
             $alliance[stickIndex][teamIndex].value = "Team " + (teamIndex + 1);
             autoZone[stickIndex][teamIndex] = bgColors[0];
             teleopZone[stickIndex][teamIndex] = bgColors[0];
+            autoData[stickIndex][teamIndex] = [0, 0, 0, 0];
+            teleopData[stickIndex][teamIndex] = [0, 0, 0, 0];
             tags[stickIndex][teamIndex] = "";
             comments[stickIndex][teamIndex] = ""; 
         }
     
         for(var dataIndex = 0; dataIndex < $autoData[0].length; dataIndex++)
-        {
             $autoData[stickIndex][dataIndex].value = $teleopData[stickIndex][dataIndex].value = 0;
-            autoData[stickIndex][dataIndex] = teleopData[stickIndex][dataIndex] = 0;
-        }
 
         for(var dataIndex = 0; dataIndex < $tags.length; dataIndex++)
             $tags[stickIndex].value = $comments[stickIndex].value = "";
@@ -160,10 +159,10 @@ function main()
             
             for(var allianceIndex = 0; allianceIndex < joysticks.length; allianceIndex++)
             {
-                for(var curDataIndex = 0; curDataIndex < $autoData[joystickIndex].length; curDataIndex++)
+                for(var curDataIndex = 0; curDataIndex < $autoData[allianceIndex].length; curDataIndex++)
                 {
-                    $autoData[allianceIndex][curDataIndex].value = autoData[allianceIndex][curDataIndex];
-                    $teleopData[allianceIndex][curDataIndex].value = teleopData[allianceIndex][curDataIndex];
+                    $autoData[allianceIndex][curDataIndex].value = autoData[allianceIndex][teamIndexes[allianceIndex]][curDataIndex];
+                    $teleopData[allianceIndex][curDataIndex].value = teleopData[allianceIndex][teamIndexes[allianceIndex]][curDataIndex];
                 }
                 
                 $autoZone[allianceIndex].classList.remove(bgColors[0], bgColors[1], bgColors[2], bgColors[3]);
@@ -178,7 +177,7 @@ function main()
             if(dataIndex > -1)
             {
                 $autoData[joystickIndex][dataIndex].value = ($autoData[joystickIndex][dataIndex].value - 0) + 1; 
-                autoData[joystickIndex][teamIndexes[joystickIndex]] = $autoData[joystickIndex][dataIndex].value;
+                autoData[joystickIndex][teamIndexes[joystickIndex]][dataIndex] = $autoData[joystickIndex][dataIndex].value - 0;
             }
             
             if(zoneIndex > -1)
@@ -194,7 +193,7 @@ function main()
             if(dataIndex > -1)
             {
                 $teleopData[joystickIndex][dataIndex].value = ($teleopData[joystickIndex][dataIndex].value - 0) + 1;
-                teleopData[joystickIndex][teamIndexes[joystickIndex]] =  $teleopData[joystickIndex][dataIndex].value;
+                teleopData[joystickIndex][teamIndexes[joystickIndex]][dataIndex] =  $teleopData[joystickIndex][dataIndex].value - 0;
             }
                 
             if(zoneIndex > -1)
