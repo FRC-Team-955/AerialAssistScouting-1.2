@@ -23,7 +23,7 @@ var tags = [["", "", ""], ["", "", ""]];
 var comments = [["", "", ""], ["", "", ""]]; 
 
 var joysticks = [0, 0];
-var teamIndexs = [0, 0];
+var teamIndexes = [0, 0];
 var autoModes = [true, false];
 
 $(document).ready(init);
@@ -67,21 +67,22 @@ function reset()
     for(var stickIndex = 0; stickIndex < joysticks.length; stickIndex++)
     {
         joysticks[stickIndex] = new Joystick();
-        teamIndexs[stickIndex] = 0;
+        teamIndexes[stickIndex] = 0;
         
         for(var teamIndex = 0; teamIndex < $alliance[0].length; teamIndex++)
         {
             $alliance[stickIndex][teamIndex].value = "Team " + (teamIndex + 1);
-            autoData[stickIndex][teamIndex] = 0;
-            autoZone[stickIndex][teamIndex] = 0;
-            teleopData[stickIndex][teamIndex] = 0;
-            teleopZone[stickIndex][teamIndex] = 0;
+            autoZone[stickIndex][teamIndex] = bgColors[0];
+            teleopZone[stickIndex][teamIndex] = bgColors[0];
             tags[stickIndex][teamIndex] = "";
             comments[stickIndex][teamIndex] = ""; 
         }
     
         for(var dataIndex = 0; dataIndex < $autoData[0].length; dataIndex++)
+        {
             $autoData[stickIndex][dataIndex].value = $teleopData[stickIndex][dataIndex].value = 0;
+            autoData[stickIndex][dataIndex] = teleopData[stickIndex][dataIndex] = 0;
+        }
 
         for(var dataIndex = 0; dataIndex < $tags.length; dataIndex++)
             $tags[stickIndex].value = $comments[stickIndex].value = "";
@@ -90,6 +91,11 @@ function reset()
         $autoZone[stickIndex].classList.add(bgColors[0]);
         $teleopZone[stickIndex].classList.remove(bgColors[1], bgColors[2], bgColors[3]);
         $teleopZone[stickIndex].classList.add(bgColors[0]);
+        
+        for(var curTeamIndex = 0; curTeamIndex < $alliance[stickIndex].length; curTeamIndex++)
+            $alliance[stickIndex][curTeamIndex].style.opacity = 0.5;
+            
+        $alliance[stickIndex][teamIndexes[stickIndex]].style.opacity = 1;
     }
 }
 
@@ -106,29 +112,29 @@ function main()
         if(joysticks[joystickIndex].getButton(joycodes.back))
             autoModes[joystickIndex] = true;
         
-        var zoneChanged = false;
+        var teamIndex = -1;
         
-        if(joysticks[joystickIndex].getButton(joycodes.rightStick))
-        {
-            zoneChanged = true;
-            
-            if(autoModes[joystickIndex])
-                ++autoZone[joystickIndex][teamIndexs[joystickIndex]];
-            
-            else
-                ++teleopZone[joystickIndex][teamIndexs[joystickIndex]];
-        }
+        if(joysticks[joystickIndex].getButton(joycodes.leftBumper))
+            if((teamIndex = teamIndexes[joystickIndex] - 1) < 0)
+                teamIndex = 2;
         
-        if(joysticks[joystickIndex].getButton(joycodes.leftStick))
-        {
-            zoneChanged = true;
-            
-            if(autoModes[joystickIndex])
-                --autoZone[joystickIndex][teamIndexs[joystickIndex]];
-            
-            else
-                --teleopZone[joystickIndex][teamIndexs[joystickIndex]];
-        }
+        if(joysticks[joystickIndex].getButton(joycodes.rightBumper))
+            if((teamIndex = teamIndexes[joystickIndex] + 1) > 2)
+                teamIndex = 0;
+        
+        var zoneIndex = -1;
+        
+        if(joysticks[joystickIndex].getButton(joycodes.dpadDown))
+            zoneIndex = 0;
+        
+        if(joysticks[joystickIndex].getButton(joycodes.dpadLeft))
+            zoneIndex = 1;
+        
+        if(joysticks[joystickIndex].getButton(joycodes.dpadUp))
+            zoneIndex = 2;
+        
+        if(joysticks[joystickIndex].getButton(joycodes.dpadRight))
+            zoneIndex = 3;
         
         var dataIndex = -1;
             
@@ -144,18 +150,42 @@ function main()
         if(joysticks[joystickIndex].getButton(joycodes.y))
             dataIndex = 0;
 
-        if(autoModes[joystickIndex])
+        if(teamIndex > -1)
         {
+            for(var curTeamIndex = 0; curTeamIndex < $alliance[joystickIndex].length; curTeamIndex++)
+                $alliance[joystickIndex][curTeamIndex].style.opacity = 0.5;
+            
+            teamIndexes[joystickIndex] = teamIndex;
+            $alliance[joystickIndex][teamIndexes[joystickIndex]].style.opacity = 1;
+            
+            for(var allianceIndex = 0; allianceIndex < joysticks.length; allianceIndex++)
+            {
+                for(var curDataIndex = 0; curDataIndex < $autoData[joystickIndex].length; curDataIndex++)
+                {
+                    $autoData[allianceIndex][curDataIndex].value = autoData[allianceIndex][curDataIndex];
+                    $teleopData[allianceIndex][curDataIndex].value = teleopData[allianceIndex][curDataIndex];
+                }
+                
+                $autoZone[allianceIndex].classList.remove(bgColors[0], bgColors[1], bgColors[2], bgColors[3]);
+                $autoZone[allianceIndex].classList.add(autoZone[allianceIndex][teamIndexes[allianceIndex]]);
+                $teleopZone[allianceIndex].classList.remove(bgColors[0], bgColors[1], bgColors[2], bgColors[3]);
+                $teleopZone[allianceIndex].classList.add(teleopZone[allianceIndex][teamIndexes[allianceIndex]]);
+            }
+        }
+        
+        if(autoModes[joystickIndex])
+        {            
             if(dataIndex > -1)
             {
                 $autoData[joystickIndex][dataIndex].value = ($autoData[joystickIndex][dataIndex].value - 0) + 1; 
-                autoData[joystickIndex][teamIndexs[joystickIndex]] = $autoData[joystickIndex][dataIndex].value;
+                autoData[joystickIndex][teamIndexes[joystickIndex]] = $autoData[joystickIndex][dataIndex].value;
             }
             
-            if(zoneChanged)
+            if(zoneIndex > -1)
             {
+                autoZone[joystickIndex][teamIndexes[joystickIndex]] = bgColors[zoneIndex];
                 $autoZone[joystickIndex].classList.remove(bgColors[0], bgColors[1], bgColors[2], bgColors[3]);
-                $autoZone[joystickIndex].classList.add(bgColors[Math.abs(autoZone[joystickIndex][teamIndexs[joystickIndex]]) % bgColors.length]);
+                $autoZone[joystickIndex].classList.add(autoZone[joystickIndex][teamIndexes[joystickIndex]]);
             }
         }
         
@@ -164,13 +194,14 @@ function main()
             if(dataIndex > -1)
             {
                 $teleopData[joystickIndex][dataIndex].value = ($teleopData[joystickIndex][dataIndex].value - 0) + 1;
-                teleopData[joystickIndex][teamIndexs[joystickIndex]] =  $teleopData[joystickIndex][dataIndex].value;
+                teleopData[joystickIndex][teamIndexes[joystickIndex]] =  $teleopData[joystickIndex][dataIndex].value;
             }
                 
-            if(zoneChanged)
+            if(zoneIndex > -1)
             {
+                teleopZone[joystickIndex][teamIndexes[joystickIndex]] = bgColors[zoneIndex];
                 $teleopZone[joystickIndex].classList.remove(bgColors[0], bgColors[1], bgColors[2], bgColors[3]);
-                $teleopZone[joystickIndex].classList.add(bgColors[Math.abs(teleopZone[joystickIndex][teamIndexs[joystickIndex]]) % bgColors.length]);
+                $teleopZone[joystickIndex].classList.add(teleopZone[joystickIndex][teamIndexes[joystickIndex]]);
             }
         }
     }
