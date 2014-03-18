@@ -1,5 +1,6 @@
-var keycodes = { zero: 48, nine: 57, tab: 9 };
-var joycodes = { a: 0, b: 1, x: 2, y: 3, leftBumper: 4, rightBumper: 5, leftTrigger: 6, rightTrigger: 7, back: 8, start: 9, leftStick: 10, rightStick: 11, dpadUp: 12, dpadDown: 13, dpadLeft: 14, dpadRight: 15 };
+var keyCodes = { zero: 48, nine: 57, tab: 9 };
+var joyCodes = { a: 0, b: 1, x: 2, y: 3, leftBumper: 4, rightBumper: 5, leftTrigger: 6, rightTrigger: 7, back: 8, start: 9, leftStick: 10, rightStick: 11, dpadUp: 12, dpadDown: 13, dpadLeft: 14, dpadRight: 15 };
+var tagKeys = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
 var maxStickButtons = 16;
 var pressedThreshold = 0.5;
 var bgColors = ["backgroundBlack", "backgroundRed", "backgroundWhite", "backgroundBlue"];
@@ -32,6 +33,8 @@ $(document).ready(init);
 function init()
 {
     $("input").keypress(textInputCallback);
+    $("textarea").keyup(textAreaCallback);
+    $("#saveMatchFileBox").click(saveMatchFile);
     $(document).on('click','input[type=text]',function(){ this.select(); });
     $matchNumber = $("#matchNumber")[0];
     $matchNumber.value = 0;
@@ -105,48 +108,48 @@ function main()
     
     for(var joystickIndex = 0; joystickIndex < joysticks.length; joystickIndex++)
     {
-        if(joysticks[joystickIndex].getButton(joycodes.start))
+        if(joysticks[joystickIndex].getButton(joyCodes.start))
             autoModes[joystickIndex] = false;
         
-        if(joysticks[joystickIndex].getButton(joycodes.back))
+        if(joysticks[joystickIndex].getButton(joyCodes.back))
             autoModes[joystickIndex] = true;
         
         var teamIndex = -1;
         
-        if(joysticks[joystickIndex].getButton(joycodes.leftBumper))
+        if(joysticks[joystickIndex].getButton(joyCodes.leftBumper))
             if((teamIndex = teamIndexes[joystickIndex] - 1) < 0)
                 teamIndex = 2;
         
-        if(joysticks[joystickIndex].getButton(joycodes.rightBumper))
+        if(joysticks[joystickIndex].getButton(joyCodes.rightBumper))
             if((teamIndex = teamIndexes[joystickIndex] + 1) > 2)
                 teamIndex = 0;
         
         var zoneIndex = -1;
         
-        if(joysticks[joystickIndex].getButton(joycodes.dpadDown))
+        if(joysticks[joystickIndex].getButton(joyCodes.dpadDown))
             zoneIndex = 0;
         
-        if(joysticks[joystickIndex].getButton(joycodes.dpadLeft))
+        if(joysticks[joystickIndex].getButton(joyCodes.dpadLeft))
             zoneIndex = 1;
         
-        if(joysticks[joystickIndex].getButton(joycodes.dpadUp))
+        if(joysticks[joystickIndex].getButton(joyCodes.dpadUp))
             zoneIndex = 2;
         
-        if(joysticks[joystickIndex].getButton(joycodes.dpadRight))
+        if(joysticks[joystickIndex].getButton(joyCodes.dpadRight))
             zoneIndex = 3;
         
         var dataIndex = -1;
             
-        if(joysticks[joystickIndex].getButton(joycodes.a))
+        if(joysticks[joystickIndex].getButton(joyCodes.a))
             dataIndex = 3;
 
-        if(joysticks[joystickIndex].getButton(joycodes.b))
+        if(joysticks[joystickIndex].getButton(joyCodes.b))
             dataIndex = 2;
 
-        if(joysticks[joystickIndex].getButton(joycodes.x))
+        if(joysticks[joystickIndex].getButton(joyCodes.x))
             dataIndex = 1;
 
-        if(joysticks[joystickIndex].getButton(joycodes.y))
+        if(joysticks[joystickIndex].getButton(joyCodes.y))
             dataIndex = 0;
 
         if(teamIndex > -1)
@@ -169,6 +172,8 @@ function main()
                 $autoZone[allianceIndex].classList.add(autoZone[allianceIndex][teamIndexes[allianceIndex]]);
                 $teleopZone[allianceIndex].classList.remove(bgColors[0], bgColors[1], bgColors[2], bgColors[3]);
                 $teleopZone[allianceIndex].classList.add(teleopZone[allianceIndex][teamIndexes[allianceIndex]]);
+                $tags[allianceIndex].value = tags[allianceIndex][teamIndexes[allianceIndex]];
+                $comments[allianceIndex].value = comments[allianceIndex][teamIndexes[allianceIndex]];
             }
         }
         
@@ -208,6 +213,83 @@ function main()
     window.webkitRequestAnimationFrame(main);
 }
 
+// Saves the match data into a .csv match file
+function saveMatchFile()
+{
+    var header = "TEAM #,A HIGH,A LOW,A HOT HIGH,A HOT LOW,A ZONE GOAL,A ZONE RED,A ZONE WHITE,A ZONE BLUE,T HIGH,T LOW,T PASSES,T TRUSS,T ZONE NONE,T ZONE RED,T ZONE WHITE,T ZONE BLUE,DEF,LEGIT DEF,OFFENSE,LEGIT OFFENSE,BROKEN,CATCH FROM PLAYER,LOOSE GRIP,2BALL AUTO,GOOD WITH US,COMMENTS,\n";
+    var fileData = header;
+    
+    for(var allianceIndex = 0; allianceIndex < autoData.length; allianceIndex++)
+    {
+        for(var teamIndex = 0; teamIndex < autoData[allianceIndex].length; teamIndex++)
+        {
+            // Team number
+            fileData += $alliance[allianceIndex][teamIndex].value + ",";
+            
+            // Auto data
+            for(var dataIndex = 0; dataIndex < autoData[allianceIndex][teamIndex].length; dataIndex++)
+                fileData += "" + autoData[allianceIndex][teamIndex][dataIndex] + ",";
+            
+            // Auto zone data
+            for(var bgIndex = 0; bgIndex < bgColors.length; bgIndex++)
+            {
+                var foundZone = false;
+                
+                if($autoZone[allianceIndex].classList.contains(bgColors[bgIndex]))
+                    foundZone = true;
+                
+                fileData += foundZone + ",";
+            }
+                 
+            // Teleop data
+            for(var dataIndex = 0; dataIndex < teleopData[allianceIndex][teamIndex].length; dataIndex++)
+                fileData += "" + teleopData[allianceIndex][teamIndex][dataIndex] + ",";
+            
+            // Teleop zone data
+            for(var bgIndex = 0; bgIndex < bgColors.length; bgIndex++)
+            {
+                var foundZone = false;
+           
+                if($teleopZone[allianceIndex].classList.contains(bgColors[bgIndex]))
+                    foundZone = true;
+                
+                fileData += foundZone + ",";
+            }
+            
+            // Tag data
+            for(var tagIndex = 0; tagIndex < tagKeys.length; tagIndex++)
+            {
+                var foundTag = false;
+                
+                for(var tagDataIndex = 0; tagDataIndex < tags[allianceIndex][teamIndex].length; tagDataIndex++)
+                {
+                    if(tagKeys[tagIndex] === tags[allianceIndex][teamIndex][tagDataIndex])
+                    {
+                        foundTag = true;
+                        break;
+                    }
+                }
+                
+                fileData += foundTag + ",";
+            }
+            
+            // Comments
+            fileData += comments[allianceIndex][teamIndex] + ",\n";
+        }
+    }
+    
+    writeToFile(fileData, "Match " + $matchNumber.value + ".csv");
+    reset();
+}
+
+
+// Writes the data to the users computer with the specified name
+function writeToFile(data, fileName)
+{
+    var blob = new Blob([data], {type: "text/plain;charset=utf-8"});
+    saveAs(blob, fileName);
+}
+
 // Updates joystick
 function updateJoysticks()
 {
@@ -230,8 +312,26 @@ function textInputCallback(e)
 {
     var code = e.keyCode;
     
-    if(code !== keycodes.tab && (code < keycodes.zero || code > keycodes.nine))
+    if(code !== keyCodes.tab && (code < keyCodes.zero || code > keyCodes.nine))
         return false;
+}
+
+// Updates the data of each robot when the textarea text changes
+function textAreaCallback(e)
+{
+    var id = e.target.id;
+    
+    if(id === "redTags")
+        tags[0][teamIndexes[0]] = e.target.value;
+    
+    if(id === "blueTags")
+        tags[1][teamIndexes[1]] = e.target.value;
+    
+    if(id === "redComments")
+        comments[0][teamIndexes[0]] = e.target.value;
+    
+    if(id === "blueComments")
+        comments[1][teamIndexes[1]] = e.target.value;
 }
 
 // Lazy print function, dont want to type "console.log()" a lot
