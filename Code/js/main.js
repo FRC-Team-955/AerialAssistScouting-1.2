@@ -4,7 +4,7 @@ var joyCodes = { a: 0, b: 1, x: 2, y: 3, leftBumper: 4, rightBumper: 5, leftTrig
 var tagKeys = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
 var maxStickButtons = 16;
 var pressedThreshold = 0.5;
-var borderColors = ["borderRed", "borderBlue", "borderPurple"];
+var borderColors = ["borderRed", "borderBlue", "borderPurple", "borderGray"];
 var bgColors = ["backgroundBlack", "backgroundRed", "backgroundWhite", "backgroundBlue"];
 
 // DOM elements
@@ -29,7 +29,7 @@ var comments = [["", "", ""], ["", "", ""]];
 
 var joysticks = [0, 0];
 var teamIndexes = [0, 0];
-var autoModes = [[true, true, true], [true, true, true]];
+var autoModes = [true, true];
 
 $(document).ready(init);
 
@@ -70,6 +70,7 @@ function init()
     
     print("Inited");
     reset();
+    updateDom();
     main();
 }
 
@@ -82,6 +83,7 @@ function reset()
     {
         joysticks[stickIndex] = new Joystick();
         teamIndexes[stickIndex] = 0;
+        autoModes[stickIndex] = true;
         
         for(var teamIndex = 0; teamIndex < $alliance[0].length; teamIndex++)
         {
@@ -92,7 +94,6 @@ function reset()
             teleopData[stickIndex][teamIndex] = [0, 0, 0, 0];
             tags[stickIndex][teamIndex] = "";
             comments[stickIndex][teamIndex] = ""; 
-            autoModes[stickIndex][teamIndex] = true;
         }
     
         for(var dataIndex = 0; dataIndex < $autoData[0].length; dataIndex++)
@@ -121,10 +122,10 @@ function main()
     for(var joystickIndex = 0; joystickIndex < joysticks.length; joystickIndex++)
     {
         if(joysticks[joystickIndex].getButton(joyCodes.start))
-            autoModes[joystickIndex][teamIndexes[joystickIndex]] = false;
+            autoModes[joystickIndex] = false;
         
         if(joysticks[joystickIndex].getButton(joyCodes.back))
-            autoModes[joystickIndex][teamIndexes[joystickIndex]] = true;
+            autoModes[joystickIndex] = true;
         
         var teamIndex = -1;
         
@@ -170,8 +171,8 @@ function main()
             updateDom();
         }
 
-        if(autoModes[joystickIndex][teamIndexes[joystickIndex]])
-        {            
+        if(autoModes[joystickIndex] && dataIndex > -1 && zoneIndex > -1)
+        {   
             if(dataIndex > -1)
                 autoData[joystickIndex][teamIndexes[joystickIndex]][dataIndex]++;
 
@@ -181,7 +182,7 @@ function main()
             updateDom();
         }
 
-        else
+        else if(dataIndex > -1 && zoneIndex > -1)
         {
             if(dataIndex > -1)
                 teleopData[joystickIndex][teamIndexes[joystickIndex]][dataIndex]++;
@@ -379,12 +380,12 @@ function updateTeamData()
 // Updates the DOM elements
 function updateDom()
 {
-    $autoContainer.classList.remove(borderColors[0], borderColors[1], borderColors[2]);
-    $teleopContainer.classList.remove(borderColors[0], borderColors[1], borderColors[2]);
+    $autoContainer.classList.remove(borderColors[0], borderColors[1], borderColors[2], borderColors[3]);
+    $teleopContainer.classList.remove(borderColors[0], borderColors[1], borderColors[2], borderColors[3]);
         
     for(var allianceIndex = 0; allianceIndex < joysticks.length; allianceIndex++)
     {
-        if(autoModes[allianceIndex][teamIndexes[allianceIndex]])
+        if(autoModes[allianceIndex])
             $autoContainer.classList.add(borderColors[allianceIndex]);
         
         else
@@ -411,14 +412,16 @@ function updateDom()
     
     if($autoContainer.classList.contains(borderColors[0]) && $autoContainer.classList.contains(borderColors[1]))
     {
-        $autoContainer.classList.remove(borderColors[0], borderColors[1], borderColors[2]);
+        $autoContainer.classList.remove(borderColors[0], borderColors[1], borderColors[2], borderColors[3]);
         $autoContainer.classList.add(borderColors[2]);
+        $teleopContainer.classList.add(borderColors[3]);
     }
     
     if($teleopContainer.classList.contains(borderColors[0]) && $teleopContainer.classList.contains(borderColors[1]))
     {
-        $teleopContainer.classList.remove(borderColors[0], borderColors[1], borderColors[2]);
+        $teleopContainer.classList.remove(borderColors[0], borderColors[1], borderColors[2], borderColors[3]);
         $teleopContainer.classList.add(borderColors[2]);
+        $autoContainer.classList.add(borderColors[3]);
     }
 }
 
