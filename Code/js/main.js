@@ -4,9 +4,12 @@ var joyCodes = { a: 0, b: 1, x: 2, y: 3, leftBumper: 4, rightBumper: 5, leftTrig
 var tagKeys = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
 var maxStickButtons = 16;
 var pressedThreshold = 0.5;
+var borderColors = ["borderRed", "borderBlue", "borderPurple"];
 var bgColors = ["backgroundBlack", "backgroundRed", "backgroundWhite", "backgroundBlue"];
 
 // DOM elements
+var $autoContainer;
+var $teleopContainer;
 var $matchNumber;
 var $alliance = [[], []];
 var $autoData = [[], []];
@@ -26,7 +29,7 @@ var comments = [["", "", ""], ["", "", ""]];
 
 var joysticks = [0, 0];
 var teamIndexes = [0, 0];
-var autoModes = [true, false];
+var autoModes = [[true, true, true], [true, true, true]];
 
 $(document).ready(init);
 
@@ -42,6 +45,8 @@ function init()
     $("#createMasterFileBox").click(function(){ $("#createMasterFile").click(); });
     $("#createMasterFile").change(getLoadedFiles);
     $(document).on('click','input[type=text]',function(){ this.select(); });
+    $autoContainer = $("#autoContainer")[0];
+    $teleopContainer = $("#teleopContainer")[0];
     $matchNumber = $("#matchNumber")[0];
     $matchNumber.value = 0;
     
@@ -87,6 +92,7 @@ function reset()
             teleopData[stickIndex][teamIndex] = [0, 0, 0, 0];
             tags[stickIndex][teamIndex] = "";
             comments[stickIndex][teamIndex] = ""; 
+            autoModes[stickIndex][teamIndex] = true;
         }
     
         for(var dataIndex = 0; dataIndex < $autoData[0].length; dataIndex++)
@@ -115,10 +121,10 @@ function main()
     for(var joystickIndex = 0; joystickIndex < joysticks.length; joystickIndex++)
     {
         if(joysticks[joystickIndex].getButton(joyCodes.start))
-            autoModes[joystickIndex] = false;
+            autoModes[joystickIndex][teamIndexes[joystickIndex]] = false;
         
         if(joysticks[joystickIndex].getButton(joyCodes.back))
-            autoModes[joystickIndex] = true;
+            autoModes[joystickIndex][teamIndexes[joystickIndex]] = true;
         
         var teamIndex = -1;
         
@@ -164,7 +170,7 @@ function main()
             updateDom();
         }
 
-        if(autoModes[joystickIndex])
+        if(autoModes[joystickIndex][teamIndexes[joystickIndex]])
         {            
             if(dataIndex > -1)
                 autoData[joystickIndex][teamIndexes[joystickIndex]][dataIndex]++;
@@ -172,7 +178,7 @@ function main()
             if(zoneIndex > -1)
                 autoZone[joystickIndex][teamIndexes[joystickIndex]] = bgColors[zoneIndex];
 
-            updateTeamData();
+            updateDom();
         }
 
         else
@@ -183,7 +189,7 @@ function main()
             if(zoneIndex > -1)
                 teleopZone[joystickIndex][teamIndexes[joystickIndex]] = bgColors[zoneIndex];
 
-            updateTeamData();
+            updateDom();
         }
     }
     
@@ -193,10 +199,6 @@ function main()
 // Saves the match data into a .csv match file
 function saveMatchFile()
 {
-    print(autoData);
-    print(autoZone);
-    print(teleopData);
-    print(teleopZone);
     var fileData = header;
     
     for(var allianceIndex = 0; allianceIndex < autoData.length; allianceIndex++)
@@ -319,21 +321,15 @@ function createMasterFile(matchesData)
                 curTeamIndex = teams.length - 1;
             }
 
-            print(teams);
             teams[curTeamIndex].processData(matches[matchIndex].substring(matches[matchIndex].indexOf(",") + 1));
         }
     }
     
-    var fileData = "";
+    var fileData = header;
     
     for(var curTeamIndex in teams)
-    {
-        fileData += teams[curTeamIndex].getAvgDataStr() + "\n";
-        print(teams[curTeamIndex].getAvgDataStr());
-        print(teams[curTeamIndex].getTotalDataStr());
-    }
+        fileData += teams[curTeamIndex].getAvgDataStr() + "\n" + teams[curTeamIndex].getTotalDataStr() + "\n";
     
-    print(matches);
     writeToFile(fileData, "MasterFile.csv");
 }
 
@@ -383,8 +379,17 @@ function updateTeamData()
 // Updates the DOM elements
 function updateDom()
 {
+    $autoContainer.classList.remove(borderColors[0], borderColors[1], borderColors[2]);
+    $teleopContainer.classList.remove(borderColors[0], borderColors[1], borderColors[2]);
+        
     for(var allianceIndex = 0; allianceIndex < joysticks.length; allianceIndex++)
     {
+        if(autoModes[allianceIndex][teamIndexes[allianceIndex]])
+            $autoContainer.classList.add(borderColors[allianceIndex]);
+        
+        else
+            $teleopContainer.classList.add(borderColors[allianceIndex]);
+        
         for(var curTeamIndex = 0; curTeamIndex < $alliance[allianceIndex].length; curTeamIndex++)
             $alliance[allianceIndex][curTeamIndex].style.opacity = 0.5;
         
@@ -403,6 +408,18 @@ function updateDom()
         $tags[allianceIndex].value = tags[allianceIndex][teamIndexes[allianceIndex]];
         $comments[allianceIndex].value = comments[allianceIndex][teamIndexes[allianceIndex]];
     }
+    
+    if($autoContainer.classList.contains(borderColors[0]) && $autoContainer.classList.contains(borderColors[1]))
+    {
+        $autoContainer.classList.remove(borderColors[0], borderColors[1], borderColors[2]);
+        $autoContainer.classList.add(borderColors[2]);
+    }
+    
+    if($teleopContainer.classList.contains(borderColors[0]) && $teleopContainer.classList.contains(borderColors[1]))
+    {
+        $teleopContainer.classList.remove(borderColors[0], borderColors[1], borderColors[2]);
+        $teleopContainer.classList.add(borderColors[2]);
+    }
 }
 
 // Prevents input from entering a non-number input
@@ -417,7 +434,6 @@ function textInputCallback(e)
 // Changes zone color when user clicks on them
 function zonesClickedCallback(e)
 {
-    print(autoZone + "wefads");
     for(var zoneColorIndex = 0; zoneColorIndex < bgColors.length; zoneColorIndex++)
     {
         if(e.target.classList.contains(bgColors[zoneColorIndex]))
@@ -434,7 +450,7 @@ function zonesClickedCallback(e)
             break;
         }
     }
-    print(autoZone);
+   
     updateDom();
 }
 
@@ -455,8 +471,7 @@ function teamClickedCallback(e)
 // Rounds a number to tenths place
 function round(number)
 {
-    print(Math.floor(number * 10) / 10);
-    return Math.floor(number * 10) / 10;
+    return Math.floor((number * 100) + 0.005) / 100;
 }
 
 // Lazy print function, dont want to type "console.log()" a lot
@@ -546,19 +561,19 @@ Team.prototype.getAvgDataStr = function()
     var str = this.teamNumber + ",";
     
     for(var dataIndex = 0; dataIndex < this.autoData.length; dataIndex++)
-        str += round(this.autoData[dataIndex] / this.matches) + ",";
+        str += round(this.autoData[dataIndex] / this.matches) + " pts,";
     
     for(var dataIndex = 0; dataIndex < this.autoZones.length; dataIndex++)
-        str += round(this.autoZones[dataIndex] / this.matches) + ",";
+        str += round((this.autoZones[dataIndex] / this.matches) * 100) + "%,";
     
     for(var dataIndex = 0; dataIndex < this.teleopData.length; dataIndex++)
-        str += round(this.teleopData[dataIndex] / this.matches) + ",";
+        str += round(this.teleopData[dataIndex] / this.matches) + " pts,";
     
     for(var dataIndex = 0; dataIndex < this.teleopZones.length; dataIndex++)
-        str += round(this.teleopZones[dataIndex] / this.matches) + ",";
+        str += round((this.teleopZones[dataIndex] / this.matches) * 100) + "%,";
     
     for(var dataIndex = 0; dataIndex < this.tags.length; dataIndex++)
-        str += round(this.tags[dataIndex] / this.matches) + ",";
+        str += round((this.tags[dataIndex] / this.matches) * 100) + "%,";
     
     str += this.comments + ",";
     return str;
@@ -569,19 +584,19 @@ Team.prototype.getTotalDataStr = function()
     var str = this.teamNumber + ",";
     
     for(var dataIndex = 0; dataIndex < this.autoData.length; dataIndex++)
-        str += this.autoData[dataIndex] + ",";
+        str += this.autoData[dataIndex] + " pts,";
     
     for(var dataIndex = 0; dataIndex < this.autoZones.length; dataIndex++)
-        str += this.autoZones[dataIndex] + ",";
+        str += this.autoZones[dataIndex] + " times,";
     
     for(var dataIndex = 0; dataIndex < this.teleopData.length; dataIndex++)
-        str += this.teleopData[dataIndex] + ",";
+        str += this.teleopData[dataIndex] + " pts,";
     
     for(var dataIndex = 0; dataIndex < this.teleopZones.length; dataIndex++)
-        str += this.teleopZones[dataIndex] + ",";
+        str += this.teleopZones[dataIndex] + " times,";
     
     for(var dataIndex = 0; dataIndex < this.tags.length; dataIndex++)
-        str += this.tags[dataIndex] + ",";
+        str += this.tags[dataIndex] + " times,";
     
     str += this.comments + ",";
     return str;

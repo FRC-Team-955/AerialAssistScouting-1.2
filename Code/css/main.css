@@ -50,9 +50,24 @@ body
     border: solid rgb(204, 204, 204) 2px;
 }
 
+.borderRed
+{
+    border: solid rgb(221, 19, 33) 2px;
+}
+
+.borderPurple
+{
+    border: solid rgb(123, 70, 115) 2px;
+}
+
+.borderBlue
+{
+    border: solid rgb(14, 127, 205) 2px;
+}
+
 .backgroundRed
 {
-    background-color: rgb(221, 19, 33)
+    background-color: rgb(221, 19, 33);
 }
 
 .backgroundBlue
