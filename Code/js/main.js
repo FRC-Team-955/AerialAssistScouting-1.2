@@ -1,5 +1,7 @@
 var header = "TEAM #,A HIGH,A LOW,A HOT HIGH,A HOT LOW,A ZONE GOAL,A ZONE RED,A ZONE WHITE,A ZONE BLUE,T HIGH,T LOW,T PASSES,T TRUSS,T ZONE NONE,T ZONE RED,T ZONE WHITE,T ZONE BLUE,DEF,LEGIT DEF,OFFENSE,LEGIT OFFENSE,BROKEN,CATCH FROM PLAYER,LOOSE GRIP,2BALL AUTO,GOOD WITH US,COMMENTS,\n";
 var keyCodes = { zero: 48, nine: 57, tab: 9 };
+var dataIndexes = { high: 0, low: 1, hotHighOrPasses: 2, hotLowOrTruss: 3 };
+var zoneIndexes = { black: 0, red: 1, white: 2, blue: 3 };
 var joyCodes = { a: 0, b: 1, x: 2, y: 3, leftBumper: 4, rightBumper: 5, leftTrigger: 6, rightTrigger: 7, back: 8, start: 9, leftStick: 10, rightStick: 11, dpadUp: 12, dpadDown: 13, dpadLeft: 14, dpadRight: 15 };
 var tagKeys = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
 var maxStickButtons = 16;
@@ -36,15 +38,14 @@ $(document).ready(init);
 // Called when document loads
 function init()
 {
+    $(document).keyup(updateTeamData);
+    $(document).on('click','input[type=text]',function(){ this.select(); });
     $("input").keypress(textInputCallback);
-    $("input").blur(updateTeamData);
     $("input.team").click(teamClickedCallback);
-    $("textarea").blur(updateTeamData);
     $("div[id*=Zone").click(zonesClickedCallback);
     $("#saveMatchFileBox").click(saveMatchFile);
     $("#createMasterFileBox").click(function(){ $("#createMasterFile").click(); });
     $("#createMasterFile").change(getLoadedFiles);
-    $(document).on('click','input[type=text]',function(){ this.select(); });
     $autoContainer = $("#autoContainer")[0];
     $teleopContainer = $("#teleopContainer")[0];
     $matchNumber = $("#matchNumber")[0];
@@ -122,10 +123,16 @@ function main()
     for(var joystickIndex = 0; joystickIndex < joysticks.length; joystickIndex++)
     {
         if(joysticks[joystickIndex].getButton(joyCodes.start))
+        {
             autoModes[joystickIndex] = false;
+            updateDom();
+        }
         
         if(joysticks[joystickIndex].getButton(joyCodes.back))
+        {
             autoModes[joystickIndex] = true;
+            updateDom();
+        }
         
         var teamIndex = -1;
         
@@ -140,30 +147,30 @@ function main()
         var zoneIndex = -1;
         
         if(joysticks[joystickIndex].getButton(joyCodes.dpadDown))
-            zoneIndex = 0;
+            zoneIndex = zoneIndexes.black;
         
         if(joysticks[joystickIndex].getButton(joyCodes.dpadLeft))
-            zoneIndex = 1;
+            zoneIndex = zoneIndexes.red;
         
         if(joysticks[joystickIndex].getButton(joyCodes.dpadUp))
-            zoneIndex = 2;
+            zoneIndex = zoneIndexes.white;
         
         if(joysticks[joystickIndex].getButton(joyCodes.dpadRight))
-            zoneIndex = 3;
+            zoneIndex = zoneIndexes.blue;
         
         var dataIndex = -1;
             
         if(joysticks[joystickIndex].getButton(joyCodes.a))
-            dataIndex = 3;
+            dataIndex = dataIndexes.low;
 
         if(joysticks[joystickIndex].getButton(joyCodes.b))
-            dataIndex = 2;
+            dataIndex = dataIndexes.hotLowOrTruss;
 
         if(joysticks[joystickIndex].getButton(joyCodes.x))
-            dataIndex = 1;
+            dataIndex = dataIndexes.hotHighOrPasses;
 
         if(joysticks[joystickIndex].getButton(joyCodes.y))
-            dataIndex = 0;
+            dataIndex = dataIndexes.high;
 
         if(teamIndex > -1)
         {
@@ -171,7 +178,7 @@ function main()
             updateDom();
         }
 
-        if(autoModes[joystickIndex] && dataIndex > -1 && zoneIndex > -1)
+        if(autoModes[joystickIndex] && (dataIndex > -1 || zoneIndex > -1))
         {   
             if(dataIndex > -1)
                 autoData[joystickIndex][teamIndexes[joystickIndex]][dataIndex]++;
@@ -182,7 +189,7 @@ function main()
             updateDom();
         }
 
-        else if(dataIndex > -1 && zoneIndex > -1)
+        else if(dataIndex > -1 || zoneIndex > -1)
         {
             if(dataIndex > -1)
                 teleopData[joystickIndex][teamIndexes[joystickIndex]][dataIndex]++;
