@@ -82,14 +82,14 @@
     height: 210px;
 }
 
-.tagAndCommentContainer
+.tagOrCommentContainer
 {
     position: absolute;
     bottom: 30px;
     width: 320px;
 }
 
-.tagAndCommentInput
+.tagOrCommentInput
 {
     position: absolute;
     width: 100%;

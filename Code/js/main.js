@@ -1,13 +1,13 @@
-var header = "TEAM #,A HIGH,A LOW,A HOT HIGH,A HOT LOW,A ZONE GOAL,A ZONE RED,A ZONE WHITE,A ZONE BLUE,T HIGH,T LOW,T PASSES,T TRUSS,T ZONE NONE,T ZONE RED,T ZONE WHITE,T ZONE BLUE,DEF,LEGIT DEF,OFFENSE,LEGIT OFFENSE,BROKEN,CATCH FROM PLAYER,LOOSE GRIP,2BALL AUTO,GOOD WITH US,COMMENTS,\n";
+var header = "TEAM #,A HIGH,A LOW,A HOT HIGH,A HOT LOW,A ZONE GOAL,A ZONE RED,A ZONE WHITE,A ZONE BLUE,T HIGH,T LOW,T PASSES,T TRUSS,T ZONE NONE,T ZONE RED,T ZONE WHITE,T ZONE BLUE,DEF,LEGIT DEF,OFFENSE,LEGIT OFFENSE,BROKEN,CATCH FROM PLAYER,LOOSE GRIP,2BALL AUTO,GOOD WITH US,COMMENTS\n";
 var keyCodes = { zero: 48, nine: 57, tab: 9 };
-var dataIndexes = { high: 0, low: 1, hotHighOrPasses: 2, hotLowOrTruss: 3 };
-var zoneIndexes = { black: 0, red: 1, white: 2, blue: 3 };
 var joyCodes = { a: 0, b: 1, x: 2, y: 3, leftBumper: 4, rightBumper: 5, leftTrigger: 6, rightTrigger: 7, back: 8, start: 9, leftStick: 10, rightStick: 11, dpadUp: 12, dpadDown: 13, dpadLeft: 14, dpadRight: 15 };
 var tagKeys = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
+var maxSticks = 2;
 var maxStickButtons = 16;
 var pressedThreshold = 0.5;
-var borderColors = ["borderRed", "borderBlue", "borderPurple", "borderGray"];
-var bgColors = ["backgroundBlack", "backgroundRed", "backgroundWhite", "backgroundBlue"];
+var dataLength = 4;
+var zoneColors = { black: "backgroundBlack", red: "backgroundRed", white: "backgroundWhite", blue: "backgroundBlue", length: 4 };
+var borderColors = { gray: "borderGray", purple: "borderPurple", red: "borderRed", blue: "borderBlue" };
 
 // DOM elements
 var $autoContainer;
@@ -15,17 +15,13 @@ var $teleopContainer;
 var $matchNumber;
 var $alliance = [[], []];
 var $autoData = [[], []];
-var $autoZone = [];
 var $teleopData = [[], []];
-var $teleopZone = [];
 var $tags = [];
 var $comments = [];
 
 // Data for each robot
 var autoData = [[[], [], []], [[], [], []]];
-var autoZone = [[0, 0, 0], [0, 0, 0]];
 var teleopData = [[[], [], []], [[], [], []]];
-var teleopZone = [[0, 0, 0], [0, 0, 0]];
 var tags = [["", "", ""], ["", "", ""]];
 var comments = [["", "", ""], ["", "", ""]]; 
 
@@ -46,32 +42,35 @@ function init()
     $("#saveMatchFileBox").click(saveMatchFile);
     $("#createMasterFileBox").click(function(){ $("#createMasterFile").click(); });
     $("#createMasterFile").change(getLoadedFiles);
+    
     $autoContainer = $("#autoContainer")[0];
     $teleopContainer = $("#teleopContainer")[0];
     $matchNumber = $("#matchNumber")[0];
     $matchNumber.value = 0;
     
-    // Red
-    $alliance[0] = $("*.team[id*=red]");
-    $autoData[0] = $("input.data[id*=redAuto");
-    $autoZone[0] = $("#redAutoZone")[0];
-    $teleopData[0] = $("input.data[id*=redTeleop");
-    $teleopZone[0] = $("#redTeleopZone")[0];
-    $tags[0] = $("#redTags")[0];
-    $comments[0] = $("#redComments")[0];
-    
-    // Blue
-    $alliance[1] = $("*.team[id*=blue]");
-    $autoData[1] = $("input.data[id*=blueAuto");
-    $autoZone[1] = $("#blueAutoZone")[0];
-    $teleopData[1] = $("input.data[id*=blueTeleop");
-    $teleopZone[1] = $("#blueTeleopZone")[0];
-    $tags[1] = $("#blueTags")[0];
-    $comments[1] = $("#blueComments")[0];
+    $alliance = [
+        $("*.team[id*=red]"),
+        $("*.team[id*=blue]")
+    ];
+    $autoData = [
+        { high: $("#redAutoHigh")[0], low: $("#redAutoLow")[0], hotHigh: $("#redAutoHotHigh")[0], hotLow: $("#redAutoHotLow")[0], zone: $("#redAutoZone")[0] },
+        { high: $("#blueAutoHigh")[0], low: $("#blueAutoLow")[0], hotHigh: $("#blueAutoHotHigh")[0], hotLow: $("#blueAutoHotLow")[0], zone: $("#blueAutoZone")[0] }
+    ];
+    $teleopData = [
+        { high: $("#redTeleopHigh")[0], low: $("#redTeleopLow")[0], passes: $("#redTeleopPasses")[0], truss: $("#redTeleopTruss")[0], zone: $("#redTeleopZone")[0] },
+        { high: $("#blueTeleopHigh")[0], low: $("#blueTeleopLow")[0], passes: $("#blueTeleopPasses")[0], truss: $("#blueTeleopTruss")[0], zone: $("#blueTeleopZone")[0] }
+    ];
+    $tags = [
+        $("#redTags")[0],
+        $("#blueTags")[0]
+    ];
+    $comments = [
+        $("#redComments")[0],
+        $("#blueComments")[0]
+    ];
     
     print("Inited");
     reset();
-    updateDom();
     main();
 }
 
@@ -80,128 +79,152 @@ function reset()
 {
     $matchNumber.value = 1 + ($matchNumber.value - 0);
     
-    for(var stickIndex = 0; stickIndex < joysticks.length; stickIndex++)
+    for(var stickIndex = 0; stickIndex < maxSticks; stickIndex++)
     {
         joysticks[stickIndex] = new Joystick();
         teamIndexes[stickIndex] = 0;
         autoModes[stickIndex] = true;
         
-        for(var teamIndex = 0; teamIndex < $alliance[0].length; teamIndex++)
+        for(var teamIndex = 0; teamIndex < $alliance[stickIndex].length; teamIndex++)
         {
             $alliance[stickIndex][teamIndex].value = teamIndex + 1;
-            autoZone[stickIndex][teamIndex] = bgColors[0];
-            teleopZone[stickIndex][teamIndex] = bgColors[0];
-            autoData[stickIndex][teamIndex] = [0, 0, 0, 0];
-            teleopData[stickIndex][teamIndex] = [0, 0, 0, 0];
+            autoData[stickIndex][teamIndex] = { high: 0, low: 0, hotHigh: 0, hotLow: 0, zone: zoneColors.black };
+            teleopData[stickIndex][teamIndex] = { high: 0, low: 0, passes: 0, truss: 0, zone: zoneColors.black };
             tags[stickIndex][teamIndex] = "";
             comments[stickIndex][teamIndex] = ""; 
         }
-    
-        for(var dataIndex = 0; dataIndex < $autoData[0].length; dataIndex++)
-            $autoData[stickIndex][dataIndex].value = $teleopData[stickIndex][dataIndex].value = 0;
-
-        for(var dataIndex = 0; dataIndex < $tags.length; dataIndex++)
-            $tags[stickIndex].value = $comments[stickIndex].value = "";
-
-        $autoZone[stickIndex].classList.remove(bgColors[1], bgColors[2], bgColors[3]);
-        $autoZone[stickIndex].classList.add(bgColors[0]);
-        $teleopZone[stickIndex].classList.remove(bgColors[1], bgColors[2], bgColors[3]);
-        $teleopZone[stickIndex].classList.add(bgColors[0]);
-        
-        for(var curTeamIndex = 0; curTeamIndex < $alliance[stickIndex].length; curTeamIndex++)
-            $alliance[stickIndex][curTeamIndex].style.opacity = 0.5;
-            
-        $alliance[stickIndex][teamIndexes[stickIndex]].style.opacity = 1;
     }
+    
+    updateDom();
 }
 
 // Main loop for program
 function main()
 {
     updateJoysticks();
+    var needUpdateDom = false;
     
     for(var joystickIndex = 0; joystickIndex < joysticks.length; joystickIndex++)
     {
-        if(joysticks[joystickIndex].getButton(joyCodes.start))
+        if(joysticks[joystickIndex].getButton([joyCodes.start, joyCodes.back]))
         {
-            autoModes[joystickIndex] = false;
-            updateDom();
-        }
-        
-        if(joysticks[joystickIndex].getButton(joyCodes.back))
-        {
-            autoModes[joystickIndex] = true;
-            updateDom();
-        }
-        
-        var teamIndex = -1;
-        
-        if(joysticks[joystickIndex].getButton(joyCodes.leftBumper))
-            if((teamIndex = teamIndexes[joystickIndex] - 1) < 0)
-                teamIndex = 2;
-        
-        if(joysticks[joystickIndex].getButton(joyCodes.rightBumper))
-            if((teamIndex = teamIndexes[joystickIndex] + 1) > 2)
-                teamIndex = 0;
-        
-        var zoneIndex = -1;
-        
-        if(joysticks[joystickIndex].getButton(joyCodes.dpadDown))
-            zoneIndex = zoneIndexes.black;
-        
-        if(joysticks[joystickIndex].getButton(joyCodes.dpadLeft))
-            zoneIndex = zoneIndexes.red;
-        
-        if(joysticks[joystickIndex].getButton(joyCodes.dpadUp))
-            zoneIndex = zoneIndexes.white;
-        
-        if(joysticks[joystickIndex].getButton(joyCodes.dpadRight))
-            zoneIndex = zoneIndexes.blue;
-        
-        var dataIndex = -1;
+            if(joysticks[joystickIndex].getButton(joyCodes.start))
+                autoModes[joystickIndex] = false;
             
-        if(joysticks[joystickIndex].getButton(joyCodes.a))
-            dataIndex = dataIndexes.low;
-
-        if(joysticks[joystickIndex].getButton(joyCodes.b))
-            dataIndex = dataIndexes.hotLowOrTruss;
-
-        if(joysticks[joystickIndex].getButton(joyCodes.x))
-            dataIndex = dataIndexes.hotHighOrPasses;
-
-        if(joysticks[joystickIndex].getButton(joyCodes.y))
-            dataIndex = dataIndexes.high;
-
-        if(teamIndex > -1)
-        {
-            teamIndexes[joystickIndex] = teamIndex;
-            updateDom();
+            else
+                autoModes[joystickIndex] = true;
+            
+            needUpdateDom = true;
         }
-
-        if(autoModes[joystickIndex] && (dataIndex > -1 || zoneIndex > -1))
-        {   
-            if(dataIndex > -1)
-                autoData[joystickIndex][teamIndexes[joystickIndex]][dataIndex]++;
-
-            if(zoneIndex > -1)
-                autoZone[joystickIndex][teamIndexes[joystickIndex]] = bgColors[zoneIndex];
-
-            updateDom();
-        }
-
-        else if(dataIndex > -1 || zoneIndex > -1)
+        
+        if(joysticks[joystickIndex].getButton([joyCodes.leftBumper, joyCodes.rightBumper]))
         {
-            if(dataIndex > -1)
-                teleopData[joystickIndex][teamIndexes[joystickIndex]][dataIndex]++;
+            if(joysticks[joystickIndex].getButton(joyCodes.leftBumper))
+            {
+                if(--teamIndexes[joystickIndex] < 0)
+                    teamIndexes[joystickIndex] = $alliance[joystickIndex].length - 1;
+            }
+            
+            else
+            {
+                if(++teamIndexes[joystickIndex] > $alliance[joystickIndex].length - 1)
+                    teamIndexes[joystickIndex] = 0;
+            }
+            
+            needUpdateDom = true;
+        }
+        
+        var newZoneColor = null;
+            
+        if(joysticks[joystickIndex].getButton(joyCodes.dpadDown))
+            newZoneColor = zoneColors.black;
 
-            if(zoneIndex > -1)
-                teleopZone[joystickIndex][teamIndexes[joystickIndex]] = bgColors[zoneIndex];
+        if(joysticks[joystickIndex].getButton(joyCodes.dpadLeft))
+            newZoneColor = zoneColors.red;
 
-            updateDom();
+        if(joysticks[joystickIndex].getButton(joyCodes.dpadUp))
+            newZoneColor = zoneColors.white;
+
+        if(joysticks[joystickIndex].getButton(joyCodes.dpadRight))
+            newZoneColor = zoneColors.blue;
+        
+        if(joysticks[joystickIndex].getButton([joyCodes.a, joyCodes.b, joyCodes.x, joyCodes.y]) || newZoneColor !== null)
+        {
+            if(autoModes[joystickIndex])
+            {
+                if(newZoneColor !== null)
+                    autoData[joystickIndex][teamIndexes[joystickIndex]].zone = newZoneColor;
+                
+                if(joysticks[joystickIndex].getButton(joyCodes.y))
+                    autoData[joystickIndex][teamIndexes[joystickIndex]].high++;
+
+                if(joysticks[joystickIndex].getButton(joyCodes.a))
+                    autoData[joystickIndex][teamIndexes[joystickIndex]].low++;
+
+                if(joysticks[joystickIndex].getButton(joyCodes.x))
+                    autoData[joystickIndex][teamIndexes[joystickIndex]].hotHigh++;
+
+                if(joysticks[joystickIndex].getButton(joyCodes.b))
+                    autoData[joystickIndex][teamIndexes[joystickIndex]].hotLow++;
+            }
+            
+            else
+            {
+                if(newZoneColor !== null)
+                    teleopData[joystickIndex][teamIndexes[joystickIndex]].zone = newZoneColor;
+                
+                if(joysticks[joystickIndex].getButton(joyCodes.y))
+                    teleopData[joystickIndex][teamIndexes[joystickIndex]].high++;
+
+                if(joysticks[joystickIndex].getButton(joyCodes.a))
+                    teleopData[joystickIndex][teamIndexes[joystickIndex]].low++;
+
+                if(joysticks[joystickIndex].getButton(joyCodes.x))
+                    teleopData[joystickIndex][teamIndexes[joystickIndex]].passes++;
+
+                if(joysticks[joystickIndex].getButton(joyCodes.b))
+                    teleopData[joystickIndex][teamIndexes[joystickIndex]].truss++;
+            }
+        
+            needUpdateDom = true;
         }
     }
     
+    if(needUpdateDom)
+        updateDom();
+    
     window.webkitRequestAnimationFrame(main);
+}
+
+// Sets the zone color of the specified zone
+function setZoneColor(curColors, newColor)
+{
+    curColors.remove(zoneColors.black, zoneColors.red, zoneColors.white, zoneColors.blue);
+    curColors.add(newColor);
+    return curColors;
+}
+
+// Gets the zone color of the specified zone
+function getZoneColor(curColors)
+{
+    if(curColors.contains(zoneColors.red))
+        return zoneColors.red;
+    
+    if(curColors.contains(zoneColors.white))
+        return zoneColors.white;
+    
+    if(curColors.contains(zoneColors.blue))
+        return zoneColors.blue;
+    
+    return zoneColors.black;
+}
+
+// Sets the data container border color
+function setContainerColor(curColors, newColor)
+{
+    curColors.remove(borderColors.purple, borderColors.red, borderColors.blue);
+    curColors.add(newColor);
+    return curColors;
 }
 
 // Saves the match data into a .csv match file
@@ -209,42 +232,32 @@ function saveMatchFile()
 {
     var fileData = header;
     
-    for(var allianceIndex = 0; allianceIndex < autoData.length; allianceIndex++)
+    for(var allianceIndex = 0; allianceIndex < $alliance.length; allianceIndex++)
     {
-        for(var teamIndex = 0; teamIndex < autoData[allianceIndex].length; teamIndex++)
+        for(var teamIndex = 0; teamIndex < $alliance[allianceIndex].length; teamIndex++)
         {
             // Team number
             fileData += $alliance[allianceIndex][teamIndex].value + ",";
             
             // Auto data
-            for(var dataIndex = 0; dataIndex < autoData[allianceIndex][teamIndex].length; dataIndex++)
-                fileData += autoData[allianceIndex][teamIndex][dataIndex] + ",";
+            fileData += autoData[allianceIndex][teamIndex].high + ",";
+            fileData += autoData[allianceIndex][teamIndex].low + ",";
+            fileData += autoData[allianceIndex][teamIndex].hotHigh + ",";
+            fileData += autoData[allianceIndex][teamIndex].hotLow + ",";
+            fileData += (autoData[allianceIndex][teamIndex].zone === zoneColors.black) + ",";
+            fileData += (autoData[allianceIndex][teamIndex].zone === zoneColors.red) + ",";
+            fileData += (autoData[allianceIndex][teamIndex].zone === zoneColors.white) + ",";
+            fileData += (autoData[allianceIndex][teamIndex].zone === zoneColors.blue) + ",";
             
-            // Auto zone data
-            for(var bgIndex = 0; bgIndex < bgColors.length; bgIndex++)
-            {
-                var foundZone = false;
-                
-                if(autoZone[allianceIndex][teamIndex] === bgColors[bgIndex])
-                    foundZone = true;
-                
-                fileData += foundZone + ",";
-            }
-                 
             // Teleop data
-            for(var dataIndex = 0; dataIndex < teleopData[allianceIndex][teamIndex].length; dataIndex++)
-                fileData += teleopData[allianceIndex][teamIndex][dataIndex] + ",";
-            
-            // Teleop zone data
-            for(var bgIndex = 0; bgIndex < bgColors.length; bgIndex++)
-            {
-                var foundZone = false;
-           
-                if(teleopZone[allianceIndex][teamIndex] === bgColors[bgIndex])
-                    foundZone = true;
-                
-                fileData += foundZone + ",";
-            }
+            fileData += teleopData[allianceIndex][teamIndex].high + ",";
+            fileData += teleopData[allianceIndex][teamIndex].low + ",";
+            fileData += teleopData[allianceIndex][teamIndex].passes + ",";
+            fileData += teleopData[allianceIndex][teamIndex].truss + ",";
+            fileData += (teleopData[allianceIndex][teamIndex].zone === zoneColors.black) + ",";
+            fileData += (teleopData[allianceIndex][teamIndex].zone === zoneColors.red) + ",";
+            fileData += (teleopData[allianceIndex][teamIndex].zone === zoneColors.white) + ",";
+            fileData += (teleopData[allianceIndex][teamIndex].zone === zoneColors.blue) + ",";
             
             // Tag data
             for(var tagIndex = 0; tagIndex < tagKeys.length; tagIndex++)
@@ -264,7 +277,7 @@ function saveMatchFile()
             }
             
             // Comments
-            fileData += comments[allianceIndex][teamIndex] + ",\n";
+            fileData += comments[allianceIndex][teamIndex] + "\n";
         }
     }
     
@@ -273,11 +286,11 @@ function saveMatchFile()
 }
 
 // Reads all files
-function getLoadedFiles(evt)
+function getLoadedFiles(e)
 {
     print("MASTERFILE BUTTON CLICKED");
-    
-    var files = evt.target.files;
+ 
+    var files = e.target.files;
     var data = "";
     var filesLoaded = 0;
     var filesLength = files.length;
@@ -296,6 +309,8 @@ function getLoadedFiles(evt)
 
         reader.readAsText(f);
     }
+    
+    e.target.value = "";
 }
 
 // Created master file of teams
@@ -308,7 +323,7 @@ function createMasterFile(matchesData)
     
     for(var matchIndex = 0; matchIndex < matches.length; matchIndex++)
     {
-        if(matchIndex % 7 !== 0)
+        if(matchIndex % 7 !== 0) // Skip the header data
         {
             var foundTeam = false;
             var curTeamNumber = parseInt(matches[matchIndex].substring(0, matches[matchIndex].indexOf(",")));
@@ -353,7 +368,7 @@ function updateJoysticks()
 {
     var sticks = navigator.webkitGetGamepads();
     
-    for(var stickIndex = 0; stickIndex < sticks.length && stickIndex < 2; stickIndex++)
+    for(var stickIndex = 0; stickIndex < sticks.length && stickIndex < maxSticks; stickIndex++)
         if(sticks[stickIndex])
             for(var buttonIndex = 0; buttonIndex < sticks[stickIndex].buttons.length && buttonIndex < maxStickButtons; buttonIndex++)
                 joysticks[stickIndex].updateButton(buttonIndex, sticks[stickIndex].buttons[buttonIndex] > pressedThreshold);
@@ -362,22 +377,19 @@ function updateJoysticks()
 // Updates the team data 
 function updateTeamData()
 {
-    for(var allianceIndex = 0; allianceIndex < joysticks.length; allianceIndex++)
+    for(var allianceIndex = 0; allianceIndex < $alliance.length; allianceIndex++)
     {
-        for(var curDataIndex = 0; curDataIndex < $autoData[allianceIndex].length; curDataIndex++)
-        {
-            autoData[allianceIndex][teamIndexes[allianceIndex]][curDataIndex] = $autoData[allianceIndex][curDataIndex].value - 0;
-            teleopData[allianceIndex][teamIndexes[allianceIndex]][curDataIndex] = $teleopData[allianceIndex][curDataIndex].value - 0;
-        }
+        autoData[allianceIndex][teamIndexes[allianceIndex]].high = $autoData[allianceIndex].high.value - 0;
+        autoData[allianceIndex][teamIndexes[allianceIndex]].low = $autoData[allianceIndex].low.value - 0;
+        autoData[allianceIndex][teamIndexes[allianceIndex]].hotHigh = $autoData[allianceIndex].hotHigh.value - 0;
+        autoData[allianceIndex][teamIndexes[allianceIndex]].hotLow = $autoData[allianceIndex].hotLow.value - 0;
+        autoData[allianceIndex][teamIndexes[allianceIndex]].zone = getZoneColor($autoData[allianceIndex].zone.classList);
         
-        for(var zoneIndex = 0; zoneIndex < bgColors.length; zoneIndex++)
-        {
-            if($autoZone[allianceIndex].classList.contains(bgColors[zoneIndex]))
-                autoZone[allianceIndex][teamIndexes[allianceIndex]] = bgColors[zoneIndex];
-            
-            if($teleopZone[allianceIndex].classList.contains(bgColors[zoneIndex]))
-                teleopZone[allianceIndex][teamIndexes[allianceIndex]] = bgColors[zoneIndex];
-        }
+        teleopData[allianceIndex][teamIndexes[allianceIndex]].high = $teleopData[allianceIndex].high.value - 0;
+        teleopData[allianceIndex][teamIndexes[allianceIndex]].low = $teleopData[allianceIndex].low.value - 0;
+        teleopData[allianceIndex][teamIndexes[allianceIndex]].passes = $teleopData[allianceIndex].passes.value - 0;
+        teleopData[allianceIndex][teamIndexes[allianceIndex]].truss = $teleopData[allianceIndex].truss.value - 0;
+        teleopData[allianceIndex][teamIndexes[allianceIndex]].zone = getZoneColor($teleopData[allianceIndex].zone.classList);
         
         tags[allianceIndex][teamIndexes[allianceIndex]] = $tags[allianceIndex].value;
         comments[allianceIndex][teamIndexes[allianceIndex]] = $comments[allianceIndex].value;
@@ -386,50 +398,55 @@ function updateTeamData()
 
 // Updates the DOM elements
 function updateDom()
-{
-    $autoContainer.classList.remove(borderColors[0], borderColors[1], borderColors[2], borderColors[3]);
-    $teleopContainer.classList.remove(borderColors[0], borderColors[1], borderColors[2], borderColors[3]);
-        
-    for(var allianceIndex = 0; allianceIndex < joysticks.length; allianceIndex++)
+{  
+    for(var allianceIndex = 0; allianceIndex < $alliance.length; allianceIndex++)
     {
-        if(autoModes[allianceIndex])
-            $autoContainer.classList.add(borderColors[allianceIndex]);
-        
-        else
-            $teleopContainer.classList.add(borderColors[allianceIndex]);
-        
         for(var curTeamIndex = 0; curTeamIndex < $alliance[allianceIndex].length; curTeamIndex++)
             $alliance[allianceIndex][curTeamIndex].style.opacity = 0.5;
         
         $alliance[allianceIndex][teamIndexes[allianceIndex]].style.opacity = 1;
+        $autoData[allianceIndex].high.value = autoData[allianceIndex][teamIndexes[allianceIndex]].high;
+        $autoData[allianceIndex].low.value = autoData[allianceIndex][teamIndexes[allianceIndex]].low;
+        $autoData[allianceIndex].hotHigh.value = autoData[allianceIndex][teamIndexes[allianceIndex]].hotHigh;
+        $autoData[allianceIndex].hotLow.value = autoData[allianceIndex][teamIndexes[allianceIndex]].hotLow;
+        $autoData[allianceIndex].zone.classList = setZoneColor($autoData[allianceIndex].zone.classList, autoData[allianceIndex][teamIndexes[allianceIndex]].zone);
         
-        for(var curDataIndex = 0; curDataIndex < $autoData[allianceIndex].length; curDataIndex++)
-        {
-            $autoData[allianceIndex][curDataIndex].value = autoData[allianceIndex][teamIndexes[allianceIndex]][curDataIndex];
-            $teleopData[allianceIndex][curDataIndex].value = teleopData[allianceIndex][teamIndexes[allianceIndex]][curDataIndex];
-        }
+        $teleopData[allianceIndex].high.value = teleopData[allianceIndex][teamIndexes[allianceIndex]].high;
+        $teleopData[allianceIndex].low.value = teleopData[allianceIndex][teamIndexes[allianceIndex]].low;
+        $teleopData[allianceIndex].passes.value = teleopData[allianceIndex][teamIndexes[allianceIndex]].passes;
+        $teleopData[allianceIndex].truss.value = teleopData[allianceIndex][teamIndexes[allianceIndex]].truss;
+        $teleopData[allianceIndex].zone.classList = setZoneColor($teleopData[allianceIndex].zone.classList, teleopData[allianceIndex][teamIndexes[allianceIndex]].zone);
 
-        $autoZone[allianceIndex].classList.remove(bgColors[0], bgColors[1], bgColors[2], bgColors[3]);
-        $autoZone[allianceIndex].classList.add(autoZone[allianceIndex][teamIndexes[allianceIndex]]);
-        $teleopZone[allianceIndex].classList.remove(bgColors[0], bgColors[1], bgColors[2], bgColors[3]);
-        $teleopZone[allianceIndex].classList.add(teleopZone[allianceIndex][teamIndexes[allianceIndex]]);
         $tags[allianceIndex].value = tags[allianceIndex][teamIndexes[allianceIndex]];
         $comments[allianceIndex].value = comments[allianceIndex][teamIndexes[allianceIndex]];
     }
     
-    if($autoContainer.classList.contains(borderColors[0]) && $autoContainer.classList.contains(borderColors[1]))
+    var autoColor = borderColors.gray;
+    var teleopColor = borderColors.gray;
+    
+    if(autoModes[0] !== autoModes[1])
     {
-        $autoContainer.classList.remove(borderColors[0], borderColors[1], borderColors[2], borderColors[3]);
-        $autoContainer.classList.add(borderColors[2]);
-        $teleopContainer.classList.add(borderColors[3]);
+        if(autoModes[0]) // Red alliance
+            autoColor = borderColors.red;
+
+        else // Red alliance
+            teleopColor = borderColors.red;
+        
+        if(autoModes[1]) // Blue alliance
+            autoColor = borderColors.blue;
+
+        else // Red alliance
+            teleopColor = borderColors.blue;
     }
     
-    if($teleopContainer.classList.contains(borderColors[0]) && $teleopContainer.classList.contains(borderColors[1]))
-    {
-        $teleopContainer.classList.remove(borderColors[0], borderColors[1], borderColors[2], borderColors[3]);
-        $teleopContainer.classList.add(borderColors[2]);
-        $autoContainer.classList.add(borderColors[3]);
-    }
+    else if(autoModes[0])
+        autoColor = borderColors.purple;
+    
+    else
+        teleopColor = borderColors.purple;
+    
+    $autoContainer.classList = setContainerColor($autoContainer.classList, autoColor);
+    $teleopContainer.classList = setContainerColor($teleopContainer.classList, teleopColor);
 }
 
 // Prevents input from entering a non-number input
@@ -444,32 +461,27 @@ function textInputCallback(e)
 // Changes zone color when user clicks on them
 function zonesClickedCallback(e)
 {
-    for(var zoneColorIndex = 0; zoneColorIndex < bgColors.length; zoneColorIndex++)
-    {
-        if(e.target.classList.contains(bgColors[zoneColorIndex]))
-        {
-            var newColor = bgColors[(zoneColorIndex + 1) % bgColors.length];
-            var allianceIndex = e.target.id.indexOf("red") > -1 ? 0 : 1;
-            
-            if(e.target.id.indexOf("Auto") > -1)
-                autoZone[allianceIndex][teamIndexes[allianceIndex]] = newColor;
-
-            else
-                teleopZone[allianceIndex][teamIndexes[allianceIndex]] = newColor;
-
-            break;
-        }
-    }
-   
-    updateDom();
+    var curZoneColor = getZoneColor(e.target.classList);
+    
+    if(curZoneColor === zoneColors.black)
+        setZoneColor(e.target.classList, zoneColors.red);
+    
+    if(curZoneColor === zoneColors.red)
+        setZoneColor(e.target.classList, zoneColors.white);
+    
+    if(curZoneColor === zoneColors.white)
+        setZoneColor(e.target.classList, zoneColors.blue);
+    
+    if(curZoneColor === zoneColors.blue)
+        setZoneColor(e.target.classList, zoneColors.black);
+    
+    updateTeamData();
 }
 
 // Changes team to enter data for when the div is clicked
 function teamClickedCallback(e)
 {
-    var isRed = e.target.id.indexOf("red") > -1;
-    
-    if(isRed)
+    if(e.target.id.indexOf("red") > -1)
         teamIndexes[0] = e.target.id.substring("red".length) - 0 - 1;
     
     else
@@ -502,7 +514,15 @@ function Joystick()
 
 Joystick.prototype.getButton = function(index)
 {
-    return this.buttons[index];
+    if(typeof(index) === "number")
+        return this.buttons[index];
+    
+    else
+        for(var newIndex in index)
+            if(this.buttons[index[newIndex]])
+                return true;
+    
+    return false;
 };
 
 Joystick.prototype.getRawButton = function(index)
@@ -532,31 +552,30 @@ Team.prototype.processData = function(data)
 {
     this.matches++;
     data = data.split(",");
-    data.pop();
     print("Process Called: " + data);
     var dataIndex = 0;
     
-    for(var curDataIndex = 0; curDataIndex < $autoData[0].length; curDataIndex++)
+    for(var curDataIndex = 0; curDataIndex < dataLength; curDataIndex++)
         this.autoData[curDataIndex] += parseInt(data[curDataIndex + dataIndex]);
     
-    dataIndex += $autoData[0].length;
+    dataIndex += dataLength;
     
-    for(var curDataIndex = 0; curDataIndex < bgColors.length; curDataIndex++)
+    for(var curDataIndex = 0; curDataIndex < zoneColors.length; curDataIndex++)
         if(data[curDataIndex + dataIndex] === "true")
             this.autoZones[curDataIndex]++;
     
-    dataIndex += bgColors.length;
+    dataIndex += zoneColors.length;
     
-    for(var curDataIndex = 0; curDataIndex < $teleopData[0].length; curDataIndex++)
+    for(var curDataIndex = 0; curDataIndex < dataLength; curDataIndex++)
         this.teleopData[curDataIndex] += parseInt(data[curDataIndex + dataIndex]);
     
-    dataIndex += $teleopData[0].length;
+    dataIndex += dataLength;
     
-    for(var curDataIndex = 0; curDataIndex < bgColors.length; curDataIndex++)
+    for(var curDataIndex = 0; curDataIndex < zoneColors.length; curDataIndex++)
         if(data[curDataIndex + dataIndex] === "true")
             this.teleopZones[curDataIndex]++;
     
-    dataIndex += bgColors.length;
+    dataIndex += zoneColors.length;
     
     for(var curTagIndex = 0; curTagIndex < tagKeys.length; curTagIndex++)
         if(data[curTagIndex + dataIndex] === "true")
@@ -585,7 +604,7 @@ Team.prototype.getAvgDataStr = function()
     for(var dataIndex = 0; dataIndex < this.tags.length; dataIndex++)
         str += round((this.tags[dataIndex] / this.matches) * 100) + "%,";
     
-    str += this.comments + ",";
+    str += this.comments;
     return str;
 };
 
@@ -608,6 +627,6 @@ Team.prototype.getTotalDataStr = function()
     for(var dataIndex = 0; dataIndex < this.tags.length; dataIndex++)
         str += this.tags[dataIndex] + " times,";
     
-    str += this.comments + ",";
+    str += this.comments;
     return str;
 };
