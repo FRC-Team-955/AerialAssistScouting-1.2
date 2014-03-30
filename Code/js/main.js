@@ -8,6 +8,7 @@ var pressedThreshold = 0.5;
 var dataLength = 4;
 var zoneColors = { black: "backgroundBlack", red: "backgroundRed", white: "backgroundWhite", blue: "backgroundBlue", length: 4 };
 var borderColors = { gray: "borderGray", purple: "borderPurple", red: "borderRed", blue: "borderBlue" };
+var teamNumbers = [];
 
 // DOM elements
 var $autoContainer;
@@ -38,10 +39,12 @@ function init()
     $(document).on('click','input[type=text]',function(){ this.select(); });
     $("input").keypress(textInputCallback);
     $("input.team").click(teamClickedCallback);
+    $("input.team").dblclick(function(){ $("#getTeamNumbers").click(); });
     $("div[id*=Zone").click(zonesClickedCallback);
     $("#saveMatchFileBox").click(saveMatchFile);
     $("#createMasterFileBox").click(function(){ $("#createMasterFile").click(); });
-    $("#createMasterFile").change(getLoadedFiles);
+    $("#createMasterFile").change(getMatchFiles);
+    $("#getTeamNumbers").change(getTeamNumbersFile);
     
     $autoContainer = $("#autoContainer")[0];
     $teleopContainer = $("#teleopContainer")[0];
@@ -70,6 +73,17 @@ function init()
     ];
     
     print("Inited");
+    if(typeof(Storage) !== "undefined")
+    {
+        var numbers = localStorage.teamNumbers;
+        
+        if(typeof(numbers) === "undefined")
+            alert("Please upload a file containing team numbers by double clicking on the team numbers");
+        
+        else
+            processTeamNumbers(localStorage.teamNumbers);
+    }
+    
     reset();
     main();
 }
@@ -77,7 +91,7 @@ function init()
 // Resets everything in the scouting application
 function reset()
 {
-    $matchNumber.value = 1 + ($matchNumber.value - 0);
+    var curMatchNumber = $matchNumber.value = 1 + ($matchNumber.value - 0);
     
     for(var stickIndex = 0; stickIndex < maxSticks; stickIndex++)
     {
@@ -87,7 +101,12 @@ function reset()
         
         for(var teamIndex = 0; teamIndex < $alliance[stickIndex].length; teamIndex++)
         {
-            $alliance[stickIndex][teamIndex].value = teamIndex + 1;
+            if(curMatchNumber > 0 && curMatchNumber <= teamNumbers.length)
+                $alliance[stickIndex][teamIndex].value = teamNumbers[curMatchNumber - 1][stickIndex][teamIndex];
+            
+            else
+                $alliance[stickIndex][teamIndex].value = teamIndex + 1;
+            
             autoData[stickIndex][teamIndex] = { high: 0, low: 0, hotHigh: 0, hotLow: 0, zone: zoneColors.black };
             teleopData[stickIndex][teamIndex] = { high: 0, low: 0, passes: 0, truss: 0, zone: zoneColors.black };
             tags[stickIndex][teamIndex] = "";
@@ -196,6 +215,53 @@ function main()
     window.webkitRequestAnimationFrame(main);
 }
 
+// Gets the teamNumbers.txt file and processes it
+function getTeamNumbersFile(e)
+{
+    var file = e.target.files[0];
+    var reader = new FileReader();
+
+    reader.onload = function()
+    {
+        localStorage.teamNumbers = this.result;
+        processTeamNumbers(this.result);
+    };
+
+    reader.readAsText(file);
+    e.target.value = "";
+}
+
+// Processes the teamNumbers.txt file, putting it into an array
+function processTeamNumbers(data)
+{
+    print("processTeamNumbers");
+    print(data);
+    var dataArray = data.split(";");
+    dataArray.pop();
+    
+    for(var dataIndex in dataArray)
+    {
+        var curData = dataArray[dataIndex];
+        var matchNum = parseInt(curData.substring(0, curData.indexOf(":")));
+        var teams = curData.substring(curData.indexOf(":") + 1).split(",");
+        
+        if(matchNum && teams.length === 6)
+            teamNumbers[matchNum - 1] = [teams.slice(0, 3), teams.slice(3, 6)];
+        
+        else
+        {
+            var alertMsg = "Oh noes, error reading the team numbers file!\n\n";
+            alertMsg += "Incorrect format: " + curData;
+            alert(alertMsg);
+            teamNumbers.push([[1, 2, 3], [4, 5, 6]]); 
+        }
+        
+        print(matchNum);
+    }
+    
+    print(teamNumbers);
+}
+
 // Sets the zone color of the specified zone
 function setZoneColor(curColors, newColor)
 {
@@ -286,7 +352,7 @@ function saveMatchFile()
 }
 
 // Reads all files
-function getLoadedFiles(e)
+function getMatchFiles(e)
 {
     print("MASTERFILE BUTTON CLICKED");
  
