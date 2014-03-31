@@ -35,15 +35,18 @@ $(document).ready(init);
 // Called when document loads
 function init()
 {
-    $(document).keyup(updateTeamData);
-    $(document).on('click','input[type=text]',function(){ this.select(); });
-    $("input").keypress(textInputCallback);
-    $("input.team").click(teamClickedCallback);
-    $("div[id*=Zone").click(zonesClickedCallback);
+    $("input").keypress(preventNonNumber);
+    $("input").keyup(updateTeamData);
+    $("input").change(preventEmptyInput);
+    $("input[type=text]").click(function(){ this.select(); });
+    $("input.team").click(teamClicked);
+    $("div[id*=Zone").keyup(updateTeamData);
+    $("div[id*=Zone").click(zonesClicked);
     $("#matchTitleBox").dblclick(function(){ $("#getTeamNumbers").click(); });
     $("#saveMatchFileBox").click(saveMatchFile);
     $("#createMasterFileBox").click(function(){ $("#createMasterFile").click(); });
     $("#createMasterFile").change(getMatchFiles);
+    $("#matchNumber").keyup(updateTeamNumbers);
     $("#getTeamNumbers").change(getTeamNumbersFile);
     
     $autoContainer = $("#autoContainer")[0];
@@ -90,8 +93,8 @@ function init()
 
 // Resets everything in the scouting application
 function reset()
-{
-    var curMatchNumber = $matchNumber.value = 1 + ($matchNumber.value - 0);
+{    
+    $matchNumber.value = 1 + ($matchNumber.value - 0);
     
     for(var stickIndex = 0; stickIndex < maxSticks; stickIndex++)
     {
@@ -101,12 +104,6 @@ function reset()
         
         for(var teamIndex = 0; teamIndex < $alliance[stickIndex].length; teamIndex++)
         {
-            if(curMatchNumber > 0 && curMatchNumber <= teamNumbers.length)
-                $alliance[stickIndex][teamIndex].value = teamNumbers[curMatchNumber - 1][stickIndex][teamIndex];
-            
-            else
-                $alliance[stickIndex][teamIndex].value = teamIndex + 1;
-            
             autoData[stickIndex][teamIndex] = { high: 0, low: 0, hotHigh: 0, hotLow: 0, zone: zoneColors.black };
             teleopData[stickIndex][teamIndex] = { high: 0, low: 0, passes: 0, truss: 0, zone: zoneColors.black };
             tags[stickIndex][teamIndex] = "";
@@ -114,6 +111,7 @@ function reset()
         }
     }
     
+    updateTeamNumbers();
     updateDom();
 }
 
@@ -462,13 +460,31 @@ function updateTeamData()
     }
 }
 
+// Updates the team numbers in the gui
+function updateTeamNumbers()
+{
+    var curMatchNumber = $matchNumber.value - 0;
+    
+    for(var allianceIndex = 0; allianceIndex < $alliance.length; allianceIndex++)
+    {
+        for(var teamIndex = 0; teamIndex < $alliance[allianceIndex].length; teamIndex++)
+        {
+            if(curMatchNumber && curMatchNumber <= teamNumbers.length)
+                $alliance[allianceIndex][teamIndex].value = teamNumbers[curMatchNumber - 1][allianceIndex][teamIndex];
+            
+            else
+                $alliance[allianceIndex][teamIndex].value = teamIndex + 1;
+        }
+    }
+}
+
 // Updates the DOM elements
 function updateDom()
 {  
     for(var allianceIndex = 0; allianceIndex < $alliance.length; allianceIndex++)
     {
-        for(var curTeamIndex = 0; curTeamIndex < $alliance[allianceIndex].length; curTeamIndex++)
-            $alliance[allianceIndex][curTeamIndex].style.opacity = 0.5;
+        for(var teamIndex = 0; teamIndex < $alliance[allianceIndex].length; teamIndex++)
+            $alliance[allianceIndex][teamIndex].style.opacity = 0.5;
         
         $alliance[allianceIndex][teamIndexes[allianceIndex]].style.opacity = 1;
         $autoData[allianceIndex].high.value = autoData[allianceIndex][teamIndexes[allianceIndex]].high;
@@ -516,7 +532,7 @@ function updateDom()
 }
 
 // Prevents input from entering a non-number input
-function textInputCallback(e)
+function preventNonNumber(e)
 {
     var code = e.keyCode;
     
@@ -524,8 +540,21 @@ function textInputCallback(e)
         return false;
 }
 
+// Prevents empy characters
+function preventEmptyInput(e)
+{
+    if(e.target.value === "")
+        e.target.value = "0";
+    
+    if(e.target.id === "matchNumber" && e.target.value === "0")
+    {
+        e.target.value = "1";
+        updateTeamNumbers();
+    }
+}
+
 // Changes zone color when user clicks on them
-function zonesClickedCallback(e)
+function zonesClicked(e)
 {
     var curZoneColor = getZoneColor(e.target.classList);
     
@@ -545,7 +574,7 @@ function zonesClickedCallback(e)
 }
 
 // Changes team to enter data for when the div is clicked
-function teamClickedCallback(e)
+function teamClicked(e)
 {
     if(e.target.id.indexOf("red") > -1)
         teamIndexes[0] = e.target.id.substring("red".length) - 0 - 1;
