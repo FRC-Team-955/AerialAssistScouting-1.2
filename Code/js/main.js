@@ -39,8 +39,8 @@ function init()
     $(document).on('click','input[type=text]',function(){ this.select(); });
     $("input").keypress(textInputCallback);
     $("input.team").click(teamClickedCallback);
-    $("input.team").dblclick(function(){ $("#getTeamNumbers").click(); });
     $("div[id*=Zone").click(zonesClickedCallback);
+    $("#matchTitleBox").dblclick(function(){ $("#getTeamNumbers").click(); });
     $("#saveMatchFileBox").click(saveMatchFile);
     $("#createMasterFileBox").click(function(){ $("#createMasterFile").click(); });
     $("#createMasterFile").change(getMatchFiles);
@@ -78,7 +78,7 @@ function init()
         var numbers = localStorage.teamNumbers;
         
         if(typeof(numbers) === "undefined")
-            alert("Please upload a file containing team numbers by double clicking on the team numbers");
+            alert('Please upload a file containing team numbers by double clicking on "Match#:"');
         
         else
             processTeamNumbers(localStorage.teamNumbers);
