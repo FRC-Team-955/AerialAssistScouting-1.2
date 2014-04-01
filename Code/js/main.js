@@ -40,7 +40,7 @@ function init()
     $("input").change(preventEmptyInput);
     $("input[type=text]").click(function(){ this.select(); });
     $("input.team").click(teamClicked);
-    $("div[id*=Zone").keyup(updateTeamData);
+    $("textarea").keyup(updateTeamData);
     $("div[id*=Zone").click(zonesClicked);
     $("#matchTitleBox").dblclick(function(){ $("#getTeamNumbers").click(); });
     $("#saveMatchFileBox").click(saveMatchFile);
