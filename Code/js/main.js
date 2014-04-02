@@ -258,6 +258,7 @@ function processTeamNumbers(data)
     }
     
     print(teamNumbers);
+    updateTeamNumbers();
 }
 
 // Sets the zone color of the specified zone
