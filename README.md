@@ -1,9 +1,12 @@
 AerialAssistScouting-1.2
 ========================
 
-You need two gamepads to run the program, the first one connected adjusts red team values, the second, blue. You can upload a match list text file, and it will automatically fill in the team numbers with each match number; an example file is attached.
+You need two gamepads to run the program, the first one connected adjusts red team values, the second, blue. You can upload a
+match list text file, and it will automatically fill in the team numbers with each match number; an example file is attached.
 
-After each match, hit the save button and it will generate a .csv file. Once you've got a collection of matches that you want to analyze, hit the "Create Master File" button, select the match files, and it will generate a complete file with all the teams and team scores.
+After each match, hit the save button and it will generate a .csv file. Once you've got a collection of matches that you want to
+analyze, hit the "Create Master File" button, select the match files, and it will generate a complete file with all the teams and
+team scores.
 
 Team values are averages and totals.
 
