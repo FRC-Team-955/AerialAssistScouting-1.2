@@ -50,6 +50,11 @@ body
     border: solid rgb(212, 212, 212) 2px;
 }
 
+.borderLightGray
+{
+    border: solid rgb(221, 221, 221) 2px;
+}
+
 .borderRed
 {
     border: solid rgb(221, 19, 33) 2px;
@@ -85,10 +90,10 @@ body
     background-color: rgb(0, 0, 0)
 }
 
-.curvedBorder
+/*.curvedBorder
 {
     border-radius: 4px;
-}
+}*/
 
 .centerText
 {

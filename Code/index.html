@@ -6,13 +6,17 @@
     <link rel="shortcut icon" href="images/logoThumbnail.png">
     <link rel="stylesheet" type="text/css" href="css/main.css"/>
     <link rel="stylesheet" type="text/css" href="css/teams.css"/>
-    <link rel="stylesheet" type="text/css" href="css/dataCollection.css"/>
+    <link rel="stylesheet" type="text/css" href="css/autoAndTeleop.css"/>
+    <link rel="stylesheet" type="text/css" href="css/tagAndComment.css"/>
     <link rel="stylesheet" type="text/css" href="css/matchNumber.css"/>
     <link rel="stylesheet" type="text/css" href="css/fileButtons.css"/>
     <script type="text/javascript" src="js/jquery/jquery-2.1.0.min.js"></script>
     <script type="text/javascript" src="js/blob/Blob.js"></script>
     <script type="text/javascript" src="js/fileSaver/FileSaver.js"></script>
     <script type="text/javascript" src="js/main.js"></script>
+    <script type="text/javascript" src="js/eventHandlers.js"></script>
+    <script type="text/javascript" src="js/util.js"></script>
+    <script type="text/javascript" src="js/classes.js"></script>
     <title>Aerial Assist Scouting 1.2!</title>
 </head>
 <body class="backgroundLightGray">
@@ -35,7 +39,7 @@
                     <div class="label backgroundBlue curvedBorder borderGray centerText">Low:</div>
                     <div class="label backgroundBlue curvedBorder borderGray centerText">Hot High:</div>
                     <div class="label backgroundBlue curvedBorder borderGray centerText">Hot Low:</div>
-                    <div class="label backgroundBlue curvedBorder borderGray centerText">Zone:</div>
+                    <div class="label backgroundBlue curvedBorder borderGray centerText">High Attempts:</div>
                 </div>
                 <div class="redDataContainer">
                     Red
@@ -43,7 +47,7 @@
                     <input type="text" id="redAutoLow" class="data centerText">
                     <input type="text" id="redAutoHotHigh" class="data centerText">
                     <input type="text" id="redAutoHotLow" class="data centerText">
-                    <div id="redAutoZone" class="data centerText"></div>
+                    <input type="text" id="redAutoHighAttempts" class="data centerText">
                 </div>
                 <div class="blueDataContainer">
                     Blue
@@ -51,7 +55,7 @@
                     <input type="text" id="blueAutoLow" class="data centerText">
                     <input type="text" id="blueAutoHotHigh" class="data centerText">
                     <input type="text" id="blueAutoHotLow" class="data centerText">
-                    <div id="blueAutoZone" class="data centerText"></div>
+                    <input type="text" id="blueAutoHighAttempts" class="data centerText">
                 </div>
             </div>
             <div id="teleopContainer" class="backgroundLightGray dataCollection centerText">
@@ -61,7 +65,8 @@
                     <div class="label backgroundBlue curvedBorder borderGray centerText">Low:</div>
                     <div class="label backgroundBlue curvedBorder borderGray centerText">Passes:</div>
                     <div class="label backgroundBlue curvedBorder borderGray centerText">Truss:</div>
-                    <div class="label backgroundBlue curvedBorder borderGray centerText">Zone:</div>
+                    <div class="label backgroundBlue curvedBorder borderGray centerText">High Attempts:</div>
+                    <div class="label backgroundBlue curvedBorder borderGray centerText">Truss Attempts:</div>
                 </div>
                 <div class="redDataContainer">
                     Red
@@ -69,7 +74,8 @@
                     <input type="text" id="redTeleopLow" class="data centerText">
                     <input type="text" id="redTeleopPasses" class="data centerText">
                     <input type="text" id="redTeleopTruss" class="data centerText">
-                    <div id="redTeleopZone" class="data centerText"></div>
+                    <input type="text" id="redTeleopHighAttempts" class="data centerText">
+                    <input type="text" id="redTeleopTrussAttempts" class="data centerText">
                 </div>
                 <div class="blueDataContainer">
                     Blue
@@ -77,30 +83,59 @@
                     <input type="text" id="blueTeleopLow" class="data centerText">
                     <input type="text" id="blueTeleopPasses" class="data centerText">
                     <input type="text" id="blueTeleopTruss" class="data centerText">
-                    <div id="blueTeleopZone" class="data centerText"></div>
+                    <input type="text" id="blueTeleopHighAttempts" class="data centerText">
+                    <input type="text" id="blueTeleopTrussAttempts" class="data centerText">
                 </div>
             </div>
             <div id="tagsAndCommentsContainer" class="backgroundLightGray">
-                <div id="tagsContainer" class="tagOrCommentContainer centerText">
+                <div id="tagsContainer" class="centerText">
                     Tags
-                    <div class="redTagAndCommentContainer centerText">
+                    <div class="redTagContainer centerText">
                         Red
-                        <textarea id="redTags" class="tagOrCommentInput"></textarea>
+                        <div id="redTags" class="tagInput">
+                            <div class="tagColumn">
+                                <div id="offensive" class="tag offensive backgroundLightGray centerText">Offensive</div>
+                                <div id="defensive" class="tag defensive backgroundLightGray centerText">Defensive</div>
+                                <div id="broken" class="tag broken backgroundLightGray centerText">Broken</div>
+                                <div id="canCatch" class="tag canCatch backgroundLightGray centerText">Can Catch</div>
+                                <div id="looseGrip" class="tag looseGrip backgroundLightGray centerText">Loose Grip</div>
+                            </div>
+                            <div class="tagColumn">
+                                <div id="offensiveSuccess" class="tag success backgroundLightGray centerText">Success</div>
+                                <div id="defensiveSuccess" class="tag success backgroundLightGray centerText">Success</div>
+                                <div id="twoBallAuto" class="tag twoBallAuto backgroundLightGray centerText">Two Ball Autonomous</div>
+                                <div id="goodWithYou" class="tag goodWithYou backgroundLightGray centerText">Compatible with Your Team</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="blueTagAndCommentContainer centerText">
+                    <div class="blueTagContainer centerText">
                         Blue
-                        <textarea id="blueTags" class="tagOrCommentInput"></textarea>
+                        <div id="blueTags" class="tagInput">
+                            <div class="tagColumn">
+                                <div id="offensive" class="tag offensive backgroundLightGray centerText">Offensive</div>
+                                <div id="defensive" class="tag defensive backgroundLightGray centerText">Defensive</div>
+                                <div id="broken" class="tag broken backgroundLightGray centerText">Broken</div>
+                                <div id="canCatch" class="tag canCatch backgroundLightGray centerText">Can Catch</div>
+                                <div id="looseGrip" class="tag looseGrip backgroundLightGray centerText">Loose Grip</div>
+                            </div>
+                            <div class="tagColumn">
+                                <div id="offensiveSuccess" class="tag success backgroundLightGray centerText">Success</div>
+                                <div id="defensiveSuccess" class="tag success backgroundLightGray centerText">Success</div>
+                                <div id="twoBallAuto" class="tag twoBallAuto backgroundLightGray centerText">Two Ball Autonomous</div>
+                                <div id="goodWithYou" class="tag goodWithYou backgroundLightGray centerText">Compatible with Your Team</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div id="commentsContainer" class="tagOrCommentContainer centerText">
+                <div id="commentsContainer" class="centerText">
                     Comments
-                    <div class="redTagAndCommentContainer centerText">
+                    <div class="redCommentContainer centerText">
                         Red
-                        <textarea id="redComments" class="tagOrCommentInput"></textarea>
+                        <textarea id="redComments" class="commentInput"></textarea>
                     </div>
-                    <div class="blueTagAndCommentContainer centerText">
+                    <div class="blueCommentContainer centerText">
                         Blue
-                        <textarea id="blueComments" class="tagOrCommentInput"></textarea>
+                        <textarea id="blueComments" class="commentInput"></textarea>
                     </div>
                 </div>
             </div>

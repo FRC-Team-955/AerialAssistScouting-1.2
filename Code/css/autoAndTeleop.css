@@ -1,0 +1,74 @@
+#dataCollectonContainer
+{
+    position: absolute;
+    top: 85px;
+    left: 0px;
+    width: 800px;
+    height: 550px;
+}
+
+/* AUTO AND TELEOP */
+.dataCollection
+{
+    position: absolute;
+    top: 30px;
+    width: 350px;
+    height: 245px;
+}
+
+.labelContainer
+{
+    position: absolute;
+    left: 30px;
+    top: 32px;
+    bottom: 20px;
+    width: 125px;
+}
+
+.label
+{
+    position: relative;
+    width: 100%;
+    height: 24px;
+    margin: 6px auto;
+    font-size: 16px;
+}
+
+.redDataContainer
+{
+    position: absolute;
+    top: 20px;
+    right: 105px;
+    width: 65px;
+    font-size: 10px;
+}
+
+.blueDataContainer
+{
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    width: 65px;
+    font-size: 10px;
+}
+
+.data
+{
+    position: relative;
+    width: 100%;
+    height: 24px;
+    margin: 5px auto;
+    font-size: 16px;
+}
+
+/* AUTO */
+#autoContainer
+{
+    left: 30px;
+}
+
+/* TELEOP */
+#teleopContainer
+{
+    right: 30px;
+}

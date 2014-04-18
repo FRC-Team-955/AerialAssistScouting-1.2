@@ -1,0 +1,114 @@
+/* TAGS AND COMMENTS */
+#tagsAndCommentsContainer
+{
+    position: absolute;
+    left: 30px;
+    right: 30px;
+    bottom: 30px;
+    height: 210px;
+}
+
+.tagInput
+{
+    position: absolute;
+    width: 100%;
+    top: 15px;
+    left: 0px;
+    bottom: 0px;
+    background-color: rgb(238, 238, 238);
+}
+
+.commentInput
+{
+    position: absolute;
+    width: 100%;
+    top: 15px;
+    left: 0px;
+    bottom: 0px;
+    background-color: rgb(238, 238, 238);
+}
+
+.redTagContainer
+{
+    position: absolute;
+    width: 140px;
+    height: 150px;
+    left: 0px;
+    bottom: 0px;
+    font-size: 10px;
+}
+
+.redCommentContainer
+{
+    position: absolute;
+    width: 140px;
+    height: 150px;
+    left: 0px;
+    bottom: 0px;
+    font-size: 10px;
+}
+
+.blueTagContainer
+{
+    position: absolute;
+    width: 140px;
+    height: 150px;
+    right: 0px;
+    bottom: 0px;
+    font-size: 10px;
+}
+
+.blueCommentContainer
+{
+    position: absolute;
+    width: 140px;
+    height: 150px;
+    right: 0px;
+    bottom: 0px;
+    font-size: 10px;
+}
+
+#tagsContainer
+{
+    position: absolute;
+    top: 10px;
+    left: 30px;
+    bottom: 30px;
+    width: 320px;
+}
+
+#commentsContainer
+{
+    position: absolute;
+    top: 10px;
+    right: 30px;
+    bottom: 30px;
+    width: 320px;
+}
+
+.tagColumn
+{
+    width: 60px;
+    height: 100%;
+    margin: 0px 5px 0px 5px;
+    display: inline;
+    font-size: 9px;
+    float: left; 
+}
+
+.tag
+{
+    width: 100%;
+    height: 18px;
+    margin: 6px 0px 6px 0px;
+}
+
+.twoBallAuto
+{
+    height: 27px;
+}
+
+.goodWithYou
+{
+    height: 40px;
+}
