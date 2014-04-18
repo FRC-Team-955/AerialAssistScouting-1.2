@@ -9,6 +9,7 @@ var borderColors = { gray: "borderGray", purple: "borderPurple", red: "borderRed
 var teamNumbers = [];
 var joyModes = { auto: 1, teleop: 2, tag: 3 };
 var joyMode = [joyModes.auto, joyModes.auto];
+var lastInput = [{ input: null, m: null }, { input: null, m: null }];
 
 // DOM elements
 var $containers = {};
@@ -202,48 +203,64 @@ function main()
             needUpdateDom = true;
         }
         
-        if(joysticks[joystickIndex].getButton([joyCodes.a, joyCodes.b, joyCodes.x, joyCodes.y, joyCodes.dpadLeft, joyCodes.dpadUp, joyCodes.dpadRight, joyCodes.dpadDown, joyCodes.leftStick, joyCodes.rightStick, joyCodes.rightTrigger]))
+        if(joyMode[joystickIndex] === joyModes.auto)
         {
-            if(joyMode[joystickIndex] === joyModes.auto)
+            if(joysticks[joystickIndex].getButton([joyCodes.a, joyCodes.b, joyCodes.x, joyCodes.y, joyCodes.dpadUp]))
             {
+                lastInput[joystickIndex].input = autoData;
+
                 if(joysticks[joystickIndex].getButton(joyCodes.y))
-                    autoData[joystickIndex][teamIndexes[joystickIndex]].high++;
+                    lastInput[joystickIndex].m = "high";
 
                 if(joysticks[joystickIndex].getButton(joyCodes.a))
-                    autoData[joystickIndex][teamIndexes[joystickIndex]].low++;
+                    lastInput[joystickIndex].m = "low";
 
                 if(joysticks[joystickIndex].getButton(joyCodes.x))
-                    autoData[joystickIndex][teamIndexes[joystickIndex]].hotHigh++;
+                    lastInput[joystickIndex].m = "hotHigh";
 
                 if(joysticks[joystickIndex].getButton(joyCodes.b))
-                    autoData[joystickIndex][teamIndexes[joystickIndex]].hotLow++;
-                
+                    lastInput[joystickIndex].m = "hotLow";
+
                 if(joysticks[joystickIndex].getButton(joyCodes.dpadUp))
-                    autoData[joystickIndex][teamIndexes[joystickIndex]].highAttempts++;
+                    lastInput[joystickIndex].m = "highAttempts";
+
+                lastInput[joystickIndex].input[joystickIndex][teamIndexes[joystickIndex]][lastInput[joystickIndex].m]++;
+                needUpdateDom = true;
             }
+        }
             
-            else if(joyMode[joystickIndex] === joyModes.teleop)
+        else if(joyMode[joystickIndex] === joyModes.teleop)
+        {
+            if(joysticks[joystickIndex].getButton([joyCodes.a, joyCodes.b, joyCodes.x, joyCodes.y, joyCodes.dpadLeft, joyCodes.dpadUp]))
             {
+                lastInput[joystickIndex].input = teleopData;
+                
                 if(joysticks[joystickIndex].getButton(joyCodes.y))
-                    teleopData[joystickIndex][teamIndexes[joystickIndex]].high++;
+                    lastInput[joystickIndex].m = "high";
 
                 if(joysticks[joystickIndex].getButton(joyCodes.a))
-                    teleopData[joystickIndex][teamIndexes[joystickIndex]].low++;
+                    lastInput[joystickIndex].m = "low";
 
                 if(joysticks[joystickIndex].getButton(joyCodes.x))
-                    teleopData[joystickIndex][teamIndexes[joystickIndex]].passes++;
+                    lastInput[joystickIndex].m = "passes";
 
                 if(joysticks[joystickIndex].getButton(joyCodes.b))
-                    teleopData[joystickIndex][teamIndexes[joystickIndex]].truss++;
-                
+                    lastInput[joystickIndex].m = "truss";
+
                 if(joysticks[joystickIndex].getButton(joyCodes.dpadUp))
-                    teleopData[joystickIndex][teamIndexes[joystickIndex]].highAttempts++;
-                
+                    lastInput[joystickIndex].m = "highAttempts";
+
                 if(joysticks[joystickIndex].getButton(joyCodes.dpadLeft))
-                    teleopData[joystickIndex][teamIndexes[joystickIndex]].trussAttempts++;
+                    lastInput[joystickIndex].m = "trussAttempts";
+                
+                lastInput[joystickIndex].input[joystickIndex][teamIndexes[joystickIndex]][lastInput[joystickIndex].m]++;
+                needUpdateDom = true;
             }
-        
-            else if(joyMode[joystickIndex] === joyModes.tag)
+        }
+            
+        else if(joyMode[joystickIndex] === joyModes.tag)
+        {
+            if(joysticks[joystickIndex].getButton([joyCodes.a, joyCodes.b, joyCodes.x, joyCodes.y, joyCodes.dpadLeft, joyCodes.dpadRight, joyCodes.dpadDown, joyCodes.leftStick, joyCodes.rightStick]))
             {
                 if(joysticks[joystickIndex].getButton(joyCodes.y))
                     tags[joystickIndex][teamIndexes[joystickIndex]].defensiveSuccess = !tags[joystickIndex][teamIndexes[joystickIndex]].defensiveSuccess;
@@ -256,23 +273,37 @@ function main()
 
                 if(joysticks[joystickIndex].getButton(joyCodes.b))
                     tags[joystickIndex][teamIndexes[joystickIndex]].offensiveSuccess = !tags[joystickIndex][teamIndexes[joystickIndex]].offensiveSuccess;
-                
+
+                if(joysticks[joystickIndex].getButton(joyCodes.dpadLeft))
+                    tags[joystickIndex][teamIndexes[joystickIndex]].twoBallAuto = !tags[joystickIndex][teamIndexes[joystickIndex]].twoBallAuto;
+
                 if(joysticks[joystickIndex].getButton(joyCodes.dpadDown))
                     tags[joystickIndex][teamIndexes[joystickIndex]].goodWithYou = !tags[joystickIndex][teamIndexes[joystickIndex]].goodWithYou;
-                
+
                 if(joysticks[joystickIndex].getButton(joyCodes.dpadRight))
                     tags[joystickIndex][teamIndexes[joystickIndex]].broken = !tags[joystickIndex][teamIndexes[joystickIndex]].broken;
-                
+
                 if(joysticks[joystickIndex].getButton(joyCodes.leftStick))
                     tags[joystickIndex][teamIndexes[joystickIndex]].looseGrip = !tags[joystickIndex][teamIndexes[joystickIndex]].looseGrip;
-                
+
                 if(joysticks[joystickIndex].getButton(joyCodes.rightStick))
                     tags[joystickIndex][teamIndexes[joystickIndex]].canCatch = !tags[joystickIndex][teamIndexes[joystickIndex]].canCatch;
                 
-                if(joysticks[joystickIndex].getButton(joyCodes.rightTrigger))
-                    tags[joystickIndex][teamIndexes[joystickIndex]].twoBallAuto = !tags[joystickIndex][teamIndexes[joystickIndex]].twoBallAuto;
+                needUpdateDom = true;
             }
+        }
             
+        if(joysticks[joystickIndex].getButton([joyCodes.leftTrigger, joyCodes.rightTrigger]))
+        {
+            if(joysticks[joystickIndex].getButton(joyCodes.leftTrigger))
+                if(lastInput[joystickIndex].input)
+                    if(lastInput[joystickIndex].input[joystickIndex][teamIndexes[joystickIndex]][lastInput[joystickIndex].m] > 0)
+                        lastInput[joystickIndex].input[joystickIndex][teamIndexes[joystickIndex]][lastInput[joystickIndex].m]--;
+     
+            if(joysticks[joystickIndex].getButton(joyCodes.rightTrigger))
+                if(lastInput[joystickIndex].input)
+                    lastInput[joystickIndex].input[joystickIndex][teamIndexes[joystickIndex]][lastInput[joystickIndex].m]++;
+ 
             needUpdateDom = true;
         }
     }
