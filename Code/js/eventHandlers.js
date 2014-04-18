@@ -163,7 +163,7 @@ function saveMatchFile()
             fileData += tags[allianceIndex][teamIndex].defensive + ",";
             fileData += tags[allianceIndex][teamIndex].defensiveSuccess + ",";
             fileData += tags[allianceIndex][teamIndex].broken + ",";
-            fileData += tags[allianceIndex][teamIndex].catchesFromPlayer + ",";
+            fileData += tags[allianceIndex][teamIndex].canCatch + ",";
             fileData += tags[allianceIndex][teamIndex].looseGrip + ",";
             fileData += tags[allianceIndex][teamIndex].twoBallAuto + ",";
             fileData += tags[allianceIndex][teamIndex].goodWithYou + ",";

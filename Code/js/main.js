@@ -267,7 +267,7 @@ function main()
                     tags[joystickIndex][teamIndexes[joystickIndex]].looseGrip = !tags[joystickIndex][teamIndexes[joystickIndex]].looseGrip;
                 
                 if(joysticks[joystickIndex].getButton(joyCodes.rightStick))
-                    tags[joystickIndex][teamIndexes[joystickIndex]].catchesFromPlayer = !tags[joystickIndex][teamIndexes[joystickIndex]].catchesFromPlayer;
+                    tags[joystickIndex][teamIndexes[joystickIndex]].canCatch = !tags[joystickIndex][teamIndexes[joystickIndex]].canCatch;
                 
                 if(joysticks[joystickIndex].getButton(joyCodes.rightTrigger))
                     tags[joystickIndex][teamIndexes[joystickIndex]].twoBallAuto = !tags[joystickIndex][teamIndexes[joystickIndex]].twoBallAuto;
