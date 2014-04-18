@@ -182,7 +182,6 @@ function main()
             else if(joysticks[joystickIndex].getButton(joyCodes.start))
                 changeMode(joystickIndex, true);
             
-            
             needUpdateDom = true;
         }
         
@@ -350,10 +349,10 @@ function changeMode(index, increase)
         if(joyMode[index] === joyModes.auto)
             joyMode[index] = joyModes.teleop;
         
-        if(joyMode[index] === joyModes.teleop)
+        else if(joyMode[index] === joyModes.teleop)
             joyMode[index] = joyModes.tag;
         
-        if(joyMode[index] === joyModes.tag)
+        else if(joyMode[index] === joyModes.tag)
             joyMode[index] = joyModes.auto;
     }
     
@@ -362,10 +361,10 @@ function changeMode(index, increase)
         if(joyMode[index] === joyModes.auto)
             joyMode[index] = joyModes.tag;
         
-        if(joyMode[index] === joyModes.teleop)
+        else if(joyMode[index] === joyModes.teleop)
             joyMode[index] = joyModes.auto;
         
-        if(joyMode[index] === joyModes.tag)
+        else if(joyMode[index] === joyModes.tag)
             joyMode[index] = joyModes.teleop;
     }
 }

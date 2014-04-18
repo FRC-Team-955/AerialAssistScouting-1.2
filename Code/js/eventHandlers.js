@@ -100,18 +100,7 @@ function updateDom()
 function preventNonNumber(e)
 {
     var code = e.keyCode;
-    print(code);
-    if(code === 97) 
-    {    
-        joyMode[0] = joyModes.tag;
-    }
     
-    if(code === 115) 
-        {
-            joyMode[0] = joyModes.auto;
-        }
-        
-        updateDom();
     if(code !== keyCodes.tab && (code < keyCodes.zero || code > keyCodes.nine))
         return false;
 }
