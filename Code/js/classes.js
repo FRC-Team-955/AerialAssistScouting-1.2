@@ -80,10 +80,10 @@ Team.prototype.getAvgDataStr = function()
     var str = this.teamNumber + ",";
     
     for(var dataIndex = 0; dataIndex < this.autoData.length; dataIndex++)
-        str += round(this.autoData[dataIndex] / this.matches) + " pts,";
+        str += round(this.autoData[dataIndex] / this.matches) + ",";
     
     for(var dataIndex = 0; dataIndex < this.teleopData.length; dataIndex++)
-        str += round(this.teleopData[dataIndex] / this.matches) + " pts,";
+        str += round(this.teleopData[dataIndex] / this.matches) + ",";
     
     for(var dataIndex = 0; dataIndex < this.tags.length; dataIndex++)
         str += round((this.tags[dataIndex] / this.matches) * 100) + "%,";
@@ -97,13 +97,13 @@ Team.prototype.getTotalDataStr = function()
     var str = this.teamNumber + ",";
     
     for(var dataIndex = 0; dataIndex < this.autoData.length; dataIndex++)
-        str += this.autoData[dataIndex] + " pts,";
+        str += this.autoData[dataIndex] + ",";
     
     for(var dataIndex = 0; dataIndex < this.teleopData.length; dataIndex++)
-        str += this.teleopData[dataIndex] + " pts,";
+        str += this.teleopData[dataIndex] + ",";
     
     for(var dataIndex = 0; dataIndex < this.tags.length; dataIndex++)
-        str += this.tags[dataIndex] + " times,";
+        str += this.tags[dataIndex] + ",";
     
     str += this.comments;
     return str;
