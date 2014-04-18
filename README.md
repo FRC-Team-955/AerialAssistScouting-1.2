@@ -13,16 +13,16 @@ Team values are averages and totals.
 Key maps:
 
 Right/Left Bumpers: Toggle between teams<br>
-Start: Toggle Teleop<br>
-Select: Toggle Autonomous<br>
+Start: Toggle Left Between Autonomous, Teleop, and Tags<br>
+Select: Toggle Right Between Autonomous, Teleop, and Tags<br>
 
 Autonomous:
 
-A. Low hot goal<br>
-B: Low goal<br>
-X: High goal<br>
-Y: High hot goal<br>
-D-Pad: Starting Zone<br>
+B. Low hot goal<br>
+A: Low goal<br>
+X: High hot goal<br>
+Y: High goal<br>
+Up D-Pad: High Goal Attempts<br>
 
 Teleop:
 
@@ -30,16 +30,17 @@ A: Low goal<br>
 B: Truss score<br>
 X: Pass<br>
 Y: High goal<br>
-D-Pad: Zone Preference<br>
+Up D-Pad: High Goal Attempts<br>
+Left D-Pad: Truss Attempts<br>
 
 Tags:
 
-1: Defensive<br>
-2: Successful defense<br>
-3: Offensive<br>
-4: Successful offense<br>
-5: Broken<br>
-6: Can catch from player<br>
-7: Loose grip<br>
-8: Two Ball Autonomous<br>
-9: Good with (your team)<br>
+A: Defensive<br> 
+Y: Successful defense<br>
+X: Offensive<br>
+B: Successful offense<br>
+Right D-Pad: Broken<br>
+Right Joystick: Can catch from player<br>
+Left Joystick: Loose grip<br>
+Right Back Bumper: Two Ball Autonomous<br>
+Down D-Pad: Good with (your team)<br>
